@@ -5,11 +5,7 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-orbitron);
-}
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -61,7 +57,7 @@ span {
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-:Link {
+a {
   font-size: calc(0.4em + 0.4vw);
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }

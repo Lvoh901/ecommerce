@@ -1,5 +1,5 @@
-import Button from "@/components/button";
-import Card from "@/components/Card";
+import Button from "../ui/button";
+import Card from "../ui/Card";
 
 export default function Hero() {
     return (

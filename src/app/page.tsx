@@ -1,9 +1,10 @@
-import CTA from "@/components/CTA";
-import Navigation from "@/components/Navigation";
-import WhyUS from "@/components/WhyUs";
-import Featured from "@/pages/Featured";
-import Footer from "@/pages/Footer";
-import Hero from "@/pages/Hero";
+import CTA from "@/components/sections/CTA";
+import Navigation from "@/components/sections/Navigation";
+import WhyUS from "@/components/sections/WhyUs";
+import Featured from "@/components/sections/Featured";
+import Footer from "@/components/sections/Footer";
+import Hero from "@/components/sections/Hero";
+import About from "@/components/sections/About";
 
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
     <div className="">
       <Navigation />
       <Hero />
+      <About />
       <Featured />
       <CTA />
       <WhyUS />
