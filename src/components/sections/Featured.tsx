@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const featuredProducts = [
     {
@@ -101,10 +102,10 @@ export default function Featured() {
                 </div>
 
                 <div className="flex justify-center">
-                    <button className="custom-btn pt-12 flex items-center gap-2 text-lg font-bold">
+                    <Link href="/categories" className="custom-btn pt-12 flex items-center gap-2 text-lg font-bold">
                         View All Categories{" "}
                         <ArrowRight className="w-5 h-5 text-[#FF4500] font-bold" />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
