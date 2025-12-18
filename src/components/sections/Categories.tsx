@@ -1,43 +1,56 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { HandHeart } from "lucide-react";
 
 const categoriesData = [
   {
-    name: "Smartphones & Accessories",
+    name: "Phone Accessories",
     description: "Stay connected with the latest phones and essential accessories.",
-    image: "/phone-case.jpg", // Placeholder image
+    image: "/phone-case.jpg",
     link: "/categories/smartphones",
   },
   {
-    name: "Laptops & Desktops",
+    name: "Computer Accessories",
     description: "Powerful machines for work, creativity, and everyday tasks.",
-    image: "/keyboards.jpg", // Placeholder image
+    image: "/keyboards.jpg",
     link: "/categories/laptops",
   },
   {
     name: "Gaming Gear",
     description: "Immersive experiences with high-performance gaming peripherals.",
-    image: "/vr-headset.jpg", // Placeholder image
+    image: "/vr-headset.jpg",
     link: "/categories/gaming",
   },
   {
     name: "Audio & Wearables",
     description: "Immerse yourself in sound and track your fitness goals.",
-    image: "/earphones.jpg", // Placeholder image
+    image: "/earphones.jpg",
     link: "/categories/audio-wearables",
   },
   {
     name: "Smart Home Devices",
     description: "Transform your living space into a connected, intelligent environment.",
-    image: "/smart-speaker.jpg", // Placeholder image
+    image: "/smart-speaker.jpg",
     link: "/categories/smart-home",
   },
   {
-    name: "Drones & Cameras",
+    name: "Drones",
     description: "Capture breathtaking moments from unique perspectives.",
-    image: "/backpack.jpg", // Placeholder image
-    link: "/categories/drones-cameras",
+    image: "/drone.jpeg",
+    link: "/categories/drones",
+  },
+  {
+    name: "Cameras",
+    description: "Capture breathtaking moments from unique perspectives.",
+    image: "/camera.jpg",
+    link: "/categories/cameras",
+  },
+  {
+    name: "Furniture",
+    description: "Capture breathtaking moments from unique perspectives.",
+    image: "/furniture.jpg",
+    link: "/categories/furniture",
   },
 ];
 
