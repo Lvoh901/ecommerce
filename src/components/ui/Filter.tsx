@@ -32,8 +32,12 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products }) => {
       const prices = products.map((p) => p.price);
       const min = Math.min(...prices);
       const max = Math.max(...prices);
-      setMinPrice(min);
-      setMaxPrice(max);
+
+      // Only update state if values actually need to change
+      setMinPrice(prev => prev !== min ? min : prev);
+      setMaxPrice(prev => prev !== max ? max : prev);
+
+      // Reset price range if products changed significantly, otherwise preserve selection
       setPriceRange([min, max]);
 
       const uniqueSubcategories = Array.from(
@@ -47,9 +51,8 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products }) => {
     const debounceTimeout = setTimeout(() => {
       onFilterChange({ priceRange, subcategories: selectedSubcategories });
     }, 300);
-
     return () => clearTimeout(debounceTimeout);
-  }, [priceRange, selectedSubcategories]);
+  }, [priceRange, selectedSubcategories, onFilterChange]);
 
   const handlePriceChange = (newRange: number[]) => {
     setPriceRange(newRange);
@@ -60,7 +63,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products }) => {
       ? selectedSubcategories.filter((s) => s !== subcategory)
       : [...selectedSubcategories, subcategory];
     setSelectedSubcategories(newSelected);
-    onFilterChange({ priceRange, subcategories: newSelected });
+    // Don't call onFilterChange directly here; let debounced effect handle it!
   };
 
   const handleClearFilters = () => {
@@ -87,30 +90,20 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products }) => {
             max={maxPrice}
             values={priceRange}
             onChange={handlePriceChange}
-            renderTrack={({ props, children }) => {
-              // Extract `key` from props and pass it explicitly
-              const { key, ...restProps } = props;
-              return (
-                <div
-                  key={key}
-                  {...restProps}
-                  className="w-full h-2 bg-gray-200 rounded-full"
-                >
-                  {children}
-                </div>
-              );
-            }}
-            renderThumb={({ props }) => {
-              // Extract `key` from props and pass it explicitly
-              const { key, ...restProps } = props;
-              return (
-                <div
-                  key={key}
-                  {...restProps}
-                  className="w-5 h-5 bg-blue-500 rounded-full"
-                />
-              );
-            }}
+            renderTrack={({ props, children }) => (
+              <div
+                {...props}
+                className="w-full h-2 bg-gray-200 rounded-full"
+              >
+                {children}
+              </div>
+            )}
+            renderThumb={({ props }) => (
+              <div
+                {...props}
+                className="w-5 h-5 bg-blue-500 rounded-full"
+              />
+            )}
           />
           <div className="flex justify-between mt-2">
             <span>${priceRange[0]}</span>
