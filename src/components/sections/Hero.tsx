@@ -10,7 +10,7 @@ export default function Hero() {
                     Stay informed with up-to-date information on high-quality gadgets, accessories, and smart solutions designed to enhance your lifestyle.
                 </p>
 
-                <div className="flex flex-wrap gap-3 pt-5">
+                <div className="flex flex-wrap gap-2 pt-5">
                     <Button btnLink="/" btnText="Explore" />
                     <Button btnLink="/" btnText="About Us" />
                 </div>

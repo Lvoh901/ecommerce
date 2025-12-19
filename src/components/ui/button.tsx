@@ -12,7 +12,7 @@ export default function Button({ btnLink, btnText }: ButtonProps) {
     return (
         <Link
             href={btnLink}
-            className="bg-gray-800 rounded-full text-[#bcbcbc] px-6 py-1.5 inline-block hover:text-white"
+            className="bg-gray-800 rounded-md text-[#bcbcbc] px-6 py-1.5 inline-block hover:text-white"
         >
             <motion.p
                 whileHover={{ scale: 1.05, boxShadow: "0 3px 15px rgba(0,0,0,0.08)" }}

@@ -6,7 +6,7 @@ export default function WhyUS() {
                     What Makes Us Unique?
                 </h2>
 
-                <ul className="text-gray-700 dark:text-gray-200 list-disc">
+                <ul className="dark:text-gray-200 list-disc">
                     <li className="mb-4">
                         Instead of just listing endless products, we provide <b className="font-medium text-[#ff4500]">personalized recommendations</b>.
                     </li>
