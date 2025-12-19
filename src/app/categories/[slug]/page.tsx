@@ -7,13 +7,22 @@ import { products } from "@/lib/data";
 import ProductCard from "@/components/ui/ProductCard";
 import Filter from "@/components/ui/Filter";
 
+type ProductType = typeof products[0];
+
+interface FiltersType {
+  priceRange: [number, number];
+  subcategories: string[];
+}
+
 export default function CategoryPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [categoryProducts, setCategoryProducts] = useState(products);
-  const [sortBy, setSortBy] = useState("name");
-  const [sortedProducts, setSortedProducts] = useState(products);
-  const [filters, setFilters] = useState({
+
+  // Dedicated state types
+  const [categoryProducts, setCategoryProducts] = useState<ProductType[]>(products);
+  const [sortBy, setSortBy] = useState<string>("name");
+  const [sortedProducts, setSortedProducts] = useState<ProductType[]>(products);
+  const [filters, setFilters] = useState<FiltersType>({
     priceRange: [0, 1000],
     subcategories: [],
   });
