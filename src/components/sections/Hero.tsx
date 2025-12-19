@@ -1,5 +1,4 @@
 import Button from "../ui/button";
-import Card from "../ui/Card";
 
 export default function Hero() {
     return (
