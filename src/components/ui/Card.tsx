@@ -1,6 +1,10 @@
 import { Computer } from "lucide-react";
 
-export default function Card({ cardValue }) {
+type CardProps = {
+    cardValue: React.ReactNode;
+};
+
+export default function Card({ cardValue }: CardProps) {
     return (
         <div
             className="hover:-translate-y-2 group bg-neutral-50 duration-500 w-44 h-44 flex text-neutral-600 flex-col justify-center items-center relative rounded-xl overflow-hidden shadow-md cursor-pointer"
