@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Navigation from "@/components/sections/Navigation";
 import Footer from "@/components/sections/Footer";
 import { useParams } from "next/navigation";
@@ -18,28 +18,44 @@ export default function CategoryPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  // Dedicated state types
-  const [categoryProducts, setCategoryProducts] = useState<ProductType[]>(products);
+  // Compute products for this category on the fly, without storing in state
+  const categoryName = slug.replace(/-/g, " ");
+  const categoryProducts = useMemo(
+    () =>
+      products.filter(
+        (product) => product.category.toLowerCase() === categoryName.toLowerCase()
+      ),
+    [categoryName]
+  );
+
   const [sortBy, setSortBy] = useState<string>("name");
-  const [sortedProducts, setSortedProducts] = useState<ProductType[]>(products);
   const [filters, setFilters] = useState<FiltersType>({
     priceRange: [0, 1000],
     subcategories: [],
   });
 
-  useEffect(() => {
-    const categoryName = slug.replace(/-/g, ' ');
-    const filtered = products.filter(
-      (product) => product.category.toLowerCase() === categoryName.toLowerCase()
-    );
-    setCategoryProducts(filtered);
-  }, [slug]);
+  // Fix Filter type props: force [number, number]
+  const handleFilterChange = (newFilters: { priceRange: number[]; subcategories: string[] }) => {
+    // Defensive: ensure priceRange has two numbers
+    if (
+      Array.isArray(newFilters.priceRange) &&
+      newFilters.priceRange.length === 2 &&
+      typeof newFilters.priceRange[0] === "number" &&
+      typeof newFilters.priceRange[1] === "number"
+    ) {
+      setFilters({
+        subcategories: newFilters.subcategories,
+        priceRange: [newFilters.priceRange[0], newFilters.priceRange[1]],
+      });
+    }
+  };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
 
-  useEffect(() => {
+  // Compute sorted and filtered products via useMemo for pure calculation
+  const sortedProducts = useMemo(() => {
     let tempProducts = [...categoryProducts];
 
     if (filters.subcategories.length > 0) {
@@ -70,7 +86,8 @@ export default function CategoryPage() {
       default:
         break;
     }
-    setSortedProducts(tempProducts);
+
+    return tempProducts;
   }, [categoryProducts, filters, sortBy]);
 
   return (
@@ -79,16 +96,15 @@ export default function CategoryPage() {
       <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl capitalize text-center">
-            {slug.replace(/-/g, ' ')}
+            {slug.replace(/-/g, " ")}
           </h1>
           <p className="mt-4 text-xl text-gray-600 text-center">
-            Explore our curated selection of {slug.replace(/-/g, ' ')} products.
+            Explore our curated selection of {slug.replace(/-/g, " ")} products.
           </p>
-
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-12">
             <div className="lg:col-span-1">
               <Filter
-                onFilterChange={setFilters}
+                onFilterChange={handleFilterChange}
                 products={categoryProducts}
               />
             </div>
