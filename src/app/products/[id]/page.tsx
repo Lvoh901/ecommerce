@@ -1,6 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
-import { products } from "@/lib/data";
+import { products } from "@/data";
+import { useCart } from "@/context/CartContext";
 import Navigation from "@/components/sections/Navigation";
 import Footer from "@/components/sections/Footer";
 import Image from "next/image";
@@ -19,6 +20,7 @@ const Rating = ({ rating }: { rating: number }) => {
 };
 
 export default function ProductPage() {
+  const { addToCart } = useCart();
   const params = useParams();
   const id = params.id as string;
   const product = products.find((p) => p.id === parseInt(id));
@@ -63,8 +65,11 @@ export default function ProductPage() {
 
               <p className="font-bold mb-4">${product.price}</p>
 
-              <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
-                Add to Cart
+              <button
+                onClick={() => product && addToCart(product)}
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <p className='uppercase'>Add to Cart</p>
               </button>
             </div>
           </div>

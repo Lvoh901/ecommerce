@@ -1,56 +1,68 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star } from 'lucide-react';
+import { Star, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { Product } from '@/utils/types';
 
 interface ProductCardProps {
-  product: {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    category: string;
-    rating: number;
-  };
+  product: Product;
 }
 
 const Rating = ({ rating }: { rating: number }) => {
   const stars = [];
   for (let i = 0; i < 5; i++) {
     if (i < rating) {
-      stars.push(<Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />);
+      stars.push(<Star key={i} className="w-4 h-4 text-yellow-500 fill-current" />);
     } else {
-      stars.push(<Star key={i} className="w-5 h-5 text-gray-300" />);
+      stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
     }
   }
   return <div className="flex items-center">{stars}</div>;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { addToCart } = useCart();
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="relative h-48">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col h-full group">
+      <div className="relative h-56 overflow-hidden">
         <Image
           src={product.image}
           alt={product.name}
           layout="fill"
           objectFit="cover"
+          className="group-hover:scale-110 transition-transform duration-500"
         />
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300" />
       </div>
 
-      <div className="p-4">
-        <p className="font-bold">{product.name}</p>
-
-        <p className="text-gray-500">{product.category}</p>
-
-        <div className="mt-2">
-          <Rating rating={product.rating} />
+      <div className="p-5 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <p className="text-[#FF4500] font-bold uppercase tracking-wider">{product.category}</p>
+            <p className="font-bold text-gray-800" title={product.name}>{product.name}</p>
+          </div>
+          <p className="font-bold text-gray-900">Ksh.{product.price}</p>
         </div>
 
-        <div className="mt-4 flex justify-between items-center">
-          <span className="font-bold">Ksh.{product.price}</span>
-          <Link href={`/products/${product.id}`} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-            View
+        <div className="mb-4">
+          <Rating rating={product.rating || 0} />
+        </div>
+
+        <div className="mt-auto flex gap-3">
+          <Link href={`/products/${product.id}`} className="flex-1 text-center bg-gray-100 text-gray-800 font-bold py-2.5 rounded-lg hover:bg-gray-200 transition-colors">
+            <p className='uppercase'>Details</p>
           </Link>
+
+          <button
+            onClick={() => addToCart(product)}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#FF4500] text-white font-bold py-2.5 rounded-lg hover:bg-orange-700 transition-colors active:scale-95 transform"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <p className='uppercase'>Add</p>
+          </button>
         </div>
       </div>
     </div>

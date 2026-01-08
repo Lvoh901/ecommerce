@@ -90,20 +90,28 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products }) => {
             max={maxPrice}
             values={priceRange}
             onChange={handlePriceChange}
-            renderTrack={({ props, children }) => (
-              <div
-                {...props}
-                className="w-full h-2 bg-gray-200 rounded-full"
-              >
-                {children}
-              </div>
-            )}
-            renderThumb={({ props }) => (
-              <div
-                {...props}
-                className="w-5 h-5 bg-blue-500 rounded-full"
-              />
-            )}
+            renderTrack={({ props, children }) => {
+              const { key, ...restProps } = props as any;
+              return (
+                <div
+                  key={key}
+                  {...restProps}
+                  className="w-full h-2 bg-gray-200 rounded-full"
+                >
+                  {children}
+                </div>
+              );
+            }}
+            renderThumb={({ props }) => {
+              const { key, ...restProps } = props as any;
+              return (
+                <div
+                  key={key}
+                  {...restProps}
+                  className="w-5 h-5 bg-blue-500 rounded-full"
+                />
+              );
+            }}
           />
           <div className="flex justify-between mt-2">
             <span>${priceRange[0]}</span>

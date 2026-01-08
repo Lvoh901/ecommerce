@@ -5,73 +5,73 @@ import Image from "next/image";
 const categoriesData = [
   {
     name: "Backpacks",
-    description: "Carry your essentials in style and comfort with durable, modern backpacks.",
+    description: "Carry your essentials in style and comfort.",
     image: "/backpack.jpg",
     link: "/categories/backpacks",
   },
   {
     name: "Earphones",
-    description: "Enjoy immersive sound on the go with high-quality, comfortable earphones.",
+    description: "Enjoy immersive sound on the go.",
     image: "/earphones.jpg",
     link: "/categories/earphones",
   },
   {
     name: "Gaming Gear",
-    description: "Elevate your gameplay with cutting-edge gaming accessories and gear.",
+    description: "Elevate your gameplay.",
     image: "/gaming_gear.jpg",
     link: "/categories/gaming",
   },
   {
     name: "Wearables",
-    description: "Track your fitness, health, and stay connected with smart wearables.",
+    description: "Track your fitness and health smartly.",
     image: "/wearable.jpg",
     link: "/categories/wearables",
   },
   {
     name: "Computer Accessories",
-    description: "Enhance your productivity with essential computer accessories.",
+    description: "Enhance your productivity.",
     image: "/computer_accessories.jpg",
     link: "/categories/computer-accessories",
   },
   {
     name: "Computers",
-    description: "Find powerful and reliable computers for work, study, and play.",
+    description: "Powerful and reliable computers.",
     image: "/computers.jpg",
     link: "/categories/computers",
   },
   {
     name: "Monitors/TVs",
-    description: "Find powerful and reliable computers for work, study, and play.",
+    description: "Amazing visual displays.",
     image: "/monitors.jpg",
     link: "/categories/monitors-tvs",
   },
   {
     name: "Phone Accessories",
-    description: "Upgrade your mobile experience with versatile phone accessories.",
+    description: "Upgrade your mobile experience.",
     image: "/phone_accessories.jpg",
     link: "/categories/phone-accessories",
   },
   {
     name: "Bluetooth Speakers",
-    description: "Enjoy wireless, high-fidelity audio anywhere with Bluetooth speakers.",
+    description: "Enjoy wireless, high-fidelity audio.",
     image: "/bluetooth_speakers.jpg",
     link: "/categories/speakers",
   },
   {
     name: "Drones",
-    description: "Capture unique perspectives and explore the skies with advanced drones.",
+    description: "Capture unique perspectives.",
     image: "/drone.jpg",
     link: "/categories/drones",
   },
   {
     name: "Cameras",
-    description: "Snap stunning photos and videos with innovative cameras.",
+    description: "Snap stunning photos and videos.",
     image: "/camera.jpg",
     link: "/categories/camera",
   },
   {
     name: "Furniture",
-    description: "Modern furniture designs to complement your tech and living space.",
+    description: "Modern furniture designs for tech & living.",
     image: "/furniture.jpg",
     link: "/categories/furniture",
   }
@@ -106,7 +106,7 @@ const Categories = () => {
 
                 <div className="absolute inset-0 bg-black/40 transition-all duration-300 group-hover:bg-opacity-50"></div>
                 <div className="relative z-10 p-6">
-                  <h3 className="font-bold text-white group-hover:text-blue-200">{category.name}</h3>
+                  <h5 className="font-bold text-white group-hover:text-blue-200">{category.name}</h5>
                   <p className="text-gray-200 leading-none font-light">{category.description}</p>
                 </div>
               </div>

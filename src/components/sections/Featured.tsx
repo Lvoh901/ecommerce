@@ -2,35 +2,10 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-const featuredProducts = [
-    {
-        name: "Backpacks",
-        from: 1500,
-        image: "/backpack.jpg",
-        link: "/categories/backpacks",
-    },
-    {
-        name: "Computers",
-        from: 20000,
-        image: "/computers.jpg",
-        link: "/categories/computers",
-    },
-    {
-        name: "Computer Accessories",
-        from: 800,
-        image: "/computer_accessories.jpg",
-        link: "/categories/computer-accessories",
-    },
-    {
-        name: "Phone Accessories",
-        from: 800,
-        image: "/phone_accessories.jpg",
-        link: "/categories/phone-accessories",
-    }
-];
+import { featuredCategories } from "@/data";
 
 // Utility to remove duplicates by name
-const uniqueProducts = featuredProducts.filter(
+const uniqueProducts = featuredCategories.filter(
     (item, index, self) =>
         index === self.findIndex((p) => p.name.toLowerCase() === item.name.toLowerCase())
 );

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import Navigation from "@/components/sections/Navigation";
 import Footer from "@/components/sections/Footer";
 import { useParams } from "next/navigation";
-import { products } from "@/lib/data";
+import { products } from "@/data";
 import ProductCard from "@/components/ui/ProductCard";
 import Filter from "@/components/ui/Filter";
 
