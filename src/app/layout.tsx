@@ -11,6 +11,9 @@ const orbitron = Orbitron({
 export const metadata: Metadata = {
   title: "KonnectTech || Amazing customized Tech Shopping Experience",
   description: "KonnectTech offers an amazing, customized tech shopping experience, helping you discover and shop for the best gadgets tailored to your needs.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
