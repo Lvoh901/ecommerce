@@ -14,7 +14,7 @@ export default function Navigation() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+            router.push(`/shop?q=${encodeURIComponent(searchQuery)}`);
         }
     };
 
@@ -23,7 +23,7 @@ export default function Navigation() {
             <section className="container mx-auto p-4 flex justify-between items-center gap-3">
                 <div className="flex justify-between gap-3 items-center">
                     <Link href="/" className="hover:text-white hover:font-medium uppercase">Home</Link>
-                    <Link href="/categories" className="hover:text-white hover:font-medium uppercase">Categories</Link>
+                    <Link href="/shop" className="hover:text-white hover:font-medium uppercase">Shop</Link>
                 </div>
 
                 <div className="flex-1 max-w-md mx-4 hidden md:block">

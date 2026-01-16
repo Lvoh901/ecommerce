@@ -1,6 +1,4 @@
-import { Product, FeaturedCategory } from "@/utils/types";
-
-export const products: Product[] = [
+export const products = [
     {
         id: 1,
         name: 'Classic Leather Backpack',
@@ -132,32 +130,5 @@ export const products: Product[] = [
         subcategory: 'Smartwatches',
         rating: 4.7,
         reviews: 210,
-    }
-];
-
-export const featuredCategories: FeaturedCategory[] = [
-    {
-        name: "Backpacks",
-        from: 1500,
-        image: "/backpack.jpg",
-        link: "/categories/backpacks",
-    },
-    {
-        name: "Computers",
-        from: 20000,
-        image: "/computers.jpg",
-        link: "/categories/computers",
-    },
-    {
-        name: "Computer Accessories",
-        from: 800,
-        image: "/computer_accessories.jpg",
-        link: "/categories/computer-accessories",
-    },
-    {
-        name: "Phone Accessories",
-        from: 800,
-        image: "/phone_accessories.jpg",
-        link: "/categories/phone-accessories",
     }
 ];

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { Product } from '@/utils/types';
+import { Product } from '@prisma/client';
 
 interface ProductCardProps {
   product: Product;

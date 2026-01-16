@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { Product } from "@/utils/types";
 
 export interface CartItem extends Product {
@@ -67,8 +67,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const clearCart = () => setCart([]);
 
-    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const totalItems = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
+    const totalPrice = useMemo(() => cart.reduce((acc, item) => acc + item.price * item.quantity, 0), [cart]);
 
     return (
         <CartContext.Provider

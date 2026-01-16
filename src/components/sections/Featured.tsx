@@ -1,16 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 
-import { featuredCategories } from "@/data";
+export default async function Featured() {
+    const categories = await prisma.category.findMany();
 
-// Utility to remove duplicates by name
-const uniqueProducts = featuredCategories.filter(
-    (item, index, self) =>
-        index === self.findIndex((p) => p.name.toLowerCase() === item.name.toLowerCase())
-);
-
-export default function Featured() {
     return (
         <div className="bg-gradient-to-br from-white via-gray-100 to-gray-200 py-16">
             <div className="container mx-auto px-4">
@@ -19,7 +14,7 @@ export default function Featured() {
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-                    {uniqueProducts.map((product, idx) => (
+                    {categories.map((product, idx) => (
                         <Link
                             href={product.link}
                             key={product.name}
@@ -45,7 +40,7 @@ export default function Featured() {
                                 <h4 className="font-semibold mb-1 text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.60)]">{product.name}</h4>
 
                                 <p className="text-gray-200 mb-2">
-                                    From: <b className="text-[#FF4500] italic">Ksh.{product.from}</b>
+                                    From: <b className="text-[#FF4500] italic">Ksh.{product.fromPrice}</b>
                                 </p>
                             </div>
                         </Link>
@@ -53,8 +48,8 @@ export default function Featured() {
                 </div>
 
                 <div className="flex justify-center">
-                    <Link href="/categories" className="custom-btn pt-12 flex items-center gap-2 text-lg font-bold">
-                        View All Categories{" "}
+                    <Link href="/shop" className="custom-btn pt-12 flex items-center gap-2 text-lg font-bold">
+                        View All Products{" "}
                         <ArrowRight className="w-5 h-5 text-[#FF4500] font-bold" />
                     </Link>
                 </div>

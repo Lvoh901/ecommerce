@@ -1,52 +1,49 @@
 "use client";
+
 import { useMemo, useState } from "react";
 import Navigation from "@/components/sections/Navigation";
 import Footer from "@/components/sections/Footer";
-import { useParams } from "next/navigation";
-import { products } from "@/data";
 import ProductCard from "@/components/ui/ProductCard";
 import Filter from "@/components/ui/Filter";
-
-type ProductType = typeof products[0];
+import { Product } from "@prisma/client";
 
 interface FiltersType {
   priceRange: [number, number];
   subcategories: string[];
+  categories: string[]; 
 }
 
-export default function CategoryPage() {
-  const params = useParams();
-  const slug = params.slug as string;
+import { useSearchParams } from "next/navigation";
 
-  // Compute products for this category on the fly, without storing in state
-  const categoryName = slug.replace(/-/g, " ");
-  const categoryProducts = useMemo(
-    () =>
-      products.filter(
-        (product) => product.category.toLowerCase() === categoryName.toLowerCase()
-      ),
-    [categoryName]
-  );
+export default function ShopClient({ products, allCategories }: { products: Product[], allCategories: string[] }) {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q") || "";
 
   const [sortBy, setSortBy] = useState<string>("name");
+  
+  // Calculate global min/max for initial state
+  const minPrice = useMemo(() => Math.min(...products.map(p => p.price)), [products]);
+  const maxPrice = useMemo(() => Math.max(...products.map(p => p.price)), [products]);
+
   const [filters, setFilters] = useState<FiltersType>({
-    priceRange: [0, 1000],
+    priceRange: [minPrice, maxPrice],
     subcategories: [],
+    categories: [],
   });
 
-  // Fix Filter type props: force [number, number]
-  const handleFilterChange = (newFilters: { priceRange: number[]; subcategories: string[] }) => {
-    // Defensive: ensure priceRange has two numbers
+  const handleFilterChange = (newFilters: { priceRange: number[]; subcategories: string[]; categories?: string[] }) => {
     if (
-      Array.isArray(newFilters.priceRange) &&
-      newFilters.priceRange.length === 2 &&
-      typeof newFilters.priceRange[0] === "number" &&
-      typeof newFilters.priceRange[1] === "number"
+        Array.isArray(newFilters.priceRange) &&
+        newFilters.priceRange.length === 2 &&
+        typeof newFilters.priceRange[0] === "number" &&
+        typeof newFilters.priceRange[1] === "number"
     ) {
-      setFilters({
+      setFilters(prev => ({
+        ...prev,
         subcategories: newFilters.subcategories,
         priceRange: [newFilters.priceRange[0], newFilters.priceRange[1]],
-      });
+        categories: newFilters.categories || prev.categories,
+      }));
     }
   };
 
@@ -54,16 +51,32 @@ export default function CategoryPage() {
     setSortBy(e.target.value);
   };
 
-  // Compute sorted and filtered products via useMemo for pure calculation
   const sortedProducts = useMemo(() => {
-    let tempProducts = [...categoryProducts];
+    let tempProducts = [...products];
 
+    // Filter by Search Query
+    if (searchQuery) {
+        tempProducts = tempProducts.filter(product => 
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }
+
+    // Filter by Category
+    if (filters.categories.length > 0) {
+        tempProducts = tempProducts.filter(product => 
+            filters.categories.includes(product.category)
+        );
+    }
+
+    // Filter by Subcategory
     if (filters.subcategories.length > 0) {
       tempProducts = tempProducts.filter((product) =>
         filters.subcategories.includes(product.subcategory)
       );
     }
 
+    // Filter by Price
     tempProducts = tempProducts.filter(
       (product) =>
         product.price >= filters.priceRange[0] &&
@@ -88,28 +101,30 @@ export default function CategoryPage() {
     }
 
     return tempProducts;
-  }, [categoryProducts, filters, sortBy]);
+  }, [products, filters, sortBy, searchQuery]);
 
   return (
     <div>
       <Navigation />
       <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl capitalize text-center">
-            {slug.replace(/-/g, " ")}
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl text-center">
+            Shop All Products
           </h1>
           <p className="mt-4 text-xl text-gray-600 text-center">
-            Explore our curated selection of {slug.replace(/-/g, " ")} products.
+            Explore our complete collection of verified tech gadgets.
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-12">
             <div className="lg:col-span-1">
               <Filter
                 onFilterChange={handleFilterChange}
-                products={categoryProducts}
+                products={products}
+                allCategories={allCategories}
               />
             </div>
             <div className="lg:col-span-3">
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-between items-center mb-4">
+                  <p className="text-gray-600 font-medium">{sortedProducts.length} Products Found</p>
                 <select
                   onChange={handleSortChange}
                   value={sortBy}
