@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { products } from './seed-data'
+import { products, footerContent } from './seed-data'
 
 const prisma = new PrismaClient()
 
@@ -61,7 +61,7 @@ async function main() {
         })
     }
 
-    // Seed UI Content (Hero, etc.)
+    // Seed UIContent (Hero, Footer, etc.)
     await prisma.uIContent.createMany({
         data: [
             { key: "hero_title", value: "KonnectTech", group: "hero" },
@@ -69,6 +69,7 @@ async function main() {
             { key: "hero_description", value: "Discover the latest technology trends, in-depth product reviews, and essential resources tailored to your needs. Stay informed with up-to-date information on high-quality gadgets, accessories, and smart solutions designed to enhance your lifestyle.", group: "hero" },
             { key: "btn_explore", value: "Explore", group: "hero_buttons" },
             { key: "btn_about", value: "About Us", group: "hero_buttons" },
+            ...footerContent
         ]
     })
 

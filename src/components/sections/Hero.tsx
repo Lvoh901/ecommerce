@@ -22,7 +22,7 @@ export default function Hero({ content }: HeroProps) {
 
                 <div className="flex flex-wrap gap-2 pt-5">
                     <Button btnLink="/shop" btnText={content.btnExplore} />
-                    <Button btnLink="/#about" btnText={content.btnAbout} />
+                    <Button btnLink="/about" btnText={content.btnAbout} />
                 </div>
             </section>
         </div>

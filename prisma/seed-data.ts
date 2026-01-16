@@ -1,3 +1,14 @@
+export const footerContent = [
+    { key: "footer_description", value: "Your one-stop shop for premium gadgets and accessories.", group: "footer" },
+    { key: "contact_email", value: "support@konnecttech.com", group: "contact" },
+    { key: "contact_phone", value: "+254 712 345 678", group: "contact" },
+    { key: "contact_address", value: "Tech Plaza, Nairobi, Kenya", group: "contact" },
+    { key: "social_facebook", value: "https://facebook.com", group: "social" },
+    { key: "social_twitter", value: "https://twitter.com", group: "social" },
+    { key: "social_instagram", value: "https://instagram.com", group: "social" },
+    { key: "social_linkedin", value: "https://linkedin.com", group: "social" },
+];
+
 export const products = [
     {
         id: 1,

@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/db";
 import ShopClient from "@/components/shop/ShopClient";
+import Navigation from "@/components/sections/Navigation";
+import Footer from "@/components/sections/Footer";
 
-export const dynamic = 'force-dynamic'; // Ensure we get fresh data if DB changes
+export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
   const products = await prisma.product.findMany();
@@ -9,5 +11,11 @@ export default async function ShopPage() {
   // Extract unique categories
   const categories = Array.from(new Set(products.map((p: { category: string }) => p.category))) as string[];
 
-  return <ShopClient products={products} allCategories={categories} />;
+  return (
+    <>
+      <Navigation />
+      <ShopClient products={products} allCategories={categories} />
+      <Footer />
+    </>
+  );
 }
