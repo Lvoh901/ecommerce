@@ -17,7 +17,7 @@ export default function CartPage() {
                     </div>
 
                     <h4 className="font-bold text-gray-900 mb-4 font-['Orbitron']">Your Cart is Empty</h4>
-                    <p className="text-gray-500 mb-8 text-lg">Looks like you haven't added anything to your cart yet.</p>
+                    <p className="text-gray-500 mb-8 text-lg">Looks like you haven&apos;t added anything to your cart yet.</p>
                     <Link
                         href="/categories"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-bold rounded-xl text-white bg-[#FF4500] hover:bg-orange-700 transition-all transform hover:scale-105"
@@ -40,55 +40,66 @@ export default function CartPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     {/* Cart Items */}
                     <div className="lg:col-span-8 space-y-6">
-                        {cart.map((item) => (
-                            <div key={item.id} className="bg-white rounded-2xl shadow-sm p-6 flex gap-6 items-center hover:shadow-md transition-shadow">
-                                <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-100">
-                                    <Image
-                                        src={item.image}
-                                        alt={item.name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
+                        {cart.map((item) => {
+                            const {
+                                id,
+                                image,
+                                name,
+                                category,
+                                price,
+                                quantity
+                            } = item as any;
 
-                                <div className="flex-grow min-w-0">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div>
-                                            <p className="text-xs text-[#FF4500] font-bold uppercase tracking-wider mb-1">{item.category}</p>
-                                            <h3 className="text-lg font-bold text-gray-900 truncate">{item.name}</h3>
-                                        </div>
-                                        <p className="text-lg font-bold text-gray-900">Ksh.{item.price * item.quantity}</p>
+                            return (
+                                <div key={id} className="bg-white rounded-2xl shadow-sm p-6 flex gap-6 items-center hover:shadow-md transition-shadow">
+                                    <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-100">
+                                        <Image
+                                            src={image}
+                                            alt={name}
+                                            fill
+                                            className="object-cover"
+                                        />
                                     </div>
 
-                                    <div className="flex justify-between items-center mt-4">
-                                        <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
-                                                disabled={item.quantity <= 1}
-                                            >
-                                                <Minus className="w-4 h-4" />
-                                            </button>
-                                            <span className="w-8 text-center font-bold text-gray-900">{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </button>
+                                    <div className="flex-grow min-w-0">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p className="text-xs text-[#FF4500] font-bold uppercase tracking-wider mb-1">{category}</p>
+                                                <h3 className="text-lg font-bold text-gray-900 truncate">{name}</h3>
+                                            </div>
+                                            <p className="text-lg font-bold text-gray-900">Ksh.{price * quantity}</p>
                                         </div>
 
-                                        <button
-                                            onClick={() => removeFromCart(item.id)}
-                                            className="flex items-center text-red-500 hover:text-red-700 font-medium text-sm transition-colors group"
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
-                                            Remove
-                                        </button>
+                                        <div className="flex justify-between items-center mt-4">
+                                            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                                                <button
+                                                    onClick={() => updateQuantity(id, quantity - 1)}
+                                                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
+                                                    disabled={quantity <= 1}
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </button>
+                                                <span className="w-8 text-center font-bold text-gray-900">{quantity}</span>
+                                                <button
+                                                    onClick={() => updateQuantity(id, quantity + 1)}
+                                                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                            </div>
+
+                                            <button
+                                                onClick={() => removeFromCart(id)}
+                                                className="flex items-center text-red-500 hover:text-red-700 font-medium text-sm transition-colors group"
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
+                                                Remove
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Order Summary */}
