@@ -25,12 +25,14 @@ export default async function Footer() {
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                 {/* Brand Section */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-white tracking-wider font-[var(--font-orbitron)]">
-                        Konnect<span className="text-blue-500">Tech</span>
-                    </h2>
+                    <h5 className="font-bold text-white tracking-wider">
+                        KonnectTech
+                    </h5>
+
                     <p className="text-gray-400 leading-relaxed max-w-xs">
                         {getContent("footer_description") || "Your one-stop shop for premium gadgets and accessories. Experience the future of tech shopping."}
                     </p>
+
                     <div className="flex space-x-4">
                         {socialLinks.map((social, idx) => (
                             <Link 
@@ -48,8 +50,9 @@ export default async function Footer() {
 
                 {/* Quick Links */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-6 uppercase tracking-wider">Quick Links</h3>
-                    <ul className="space-y-4">
+                    <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Quick Links</h5>
+                    
+                    <ul className="space-y-2">
                         <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
                         <li><Link href="/shop" className="hover:text-blue-400 transition-colors">Shop All</Link></li>
                         <li><Link href="/about" className="hover:text-blue-400 transition-colors">About Us</Link></li>
@@ -59,8 +62,9 @@ export default async function Footer() {
 
                 {/* Categories */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-6 uppercase tracking-wider">Popular Categories</h3>
-                    <ul className="space-y-4">
+                    <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Categories</h5>
+                    
+                    <ul className="space-y-2">
                         <li><Link href="/shop?category=Computers" className="hover:text-blue-400 transition-colors">Computers</Link></li>
                         <li><Link href="/shop?category=Wearables" className="hover:text-blue-400 transition-colors">Wearables</Link></li>
                         <li><Link href="/shop?category=Gaming Gear" className="hover:text-blue-400 transition-colors">Gaming Gear</Link></li>
@@ -70,8 +74,9 @@ export default async function Footer() {
 
                 {/* Contact Info */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-6 uppercase tracking-wider">Contact Us</h3>
-                    <ul className="space-y-4">
+                    <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Contact Us</h5>
+                    
+                    <ul className="space-y-2">
                         <li className="flex items-center space-x-3">
                             <MapPin size={18} className="text-blue-500 shrink-0" />
                             <span>{getContent("contact_address") || "Nairobi, Kenya"}</span>

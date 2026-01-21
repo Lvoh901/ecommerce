@@ -21,5 +21,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  return <ProductDetailsClient product={product} />;
+  return (
+    <div>
+      <Navigation />
+      <ProductDetailsClient product={product} />
+      <Footer />
+    </div>
+  );
 }

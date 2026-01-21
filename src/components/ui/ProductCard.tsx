@@ -39,11 +39,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       <div className="p-5 flex flex-col flex-grow">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <p className="text-[#FF4500] font-bold uppercase tracking-wider">{product.category}</p>
-            <p className="font-bold text-gray-800" title={product.name}>{product.name}</p>
-          </div>
+        <div className="mb-2 flex flex-col">
+          <span className="text-[#FF4500] font-bold uppercase tracking-wider">{product.name}</span>
+          <small className="font-bold text-gray-800" title={product.name}>{product.category}</small>
           <p className="font-bold text-gray-900">Ksh.{product.price}</p>
         </div>
 
@@ -52,16 +50,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         <div className="mt-auto flex gap-3">
-          <Link href={`/products/${product.id}`} className="flex-1 text-center bg-gray-100 text-gray-800 font-bold py-2.5 rounded-lg hover:bg-gray-200 transition-colors">
-            <p className='uppercase'>Details</p>
+          <Link href={`/products/${product.id}`} className="flex-1 text-center bg-gray-100 text-gray-800 font-bold py-1.5 rounded-lg hover:bg-gray-200 transition-colors">
+            <small className='uppercase'>Details</small>
           </Link>
 
           <button
             onClick={() => addToCart(product)}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#FF4500] text-white font-bold py-2.5 rounded-lg hover:bg-orange-700 transition-colors active:scale-95 transform"
+            className="flex-1 flex items-center justify-center gap-2 bg-[#FF4500] text-white font-bold py-1.5 rounded-lg hover:bg-orange-700 transition-colors active:scale-95 transform"
           >
             <ShoppingCart className="w-5 h-5" />
-            <p className='uppercase'>Add</p>
+            <small className='uppercase'>Add</small>
           </button>
         </div>
       </div>

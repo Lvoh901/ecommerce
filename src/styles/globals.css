@@ -42,35 +42,33 @@ h2 {
 
 h3 {
   font-size: clamp(1.5rem, 2.5vw, 1.875rem);
-  /* 24px → 30px */
   font-weight: 600;
   font-family: "Orbitron", sans-serif !important;
 }
 
 h4 {
   font-size: clamp(1.25rem, 2vw, 1.5rem);
-  /* 20px → 24px */
   font-weight: 500;
   font-family: "Orbitron", sans-serif !important;
 }
 
 h5 {
   font-size: clamp(1.125rem, 1.5vw, 1.25rem);
-  /* 18px → 20px */
   font-weight: 500;
   font-family: "Orbitron", sans-serif !important;
 }
 
 p {
   font-size: clamp(1rem, 1.1vw, 1.125rem);
-  /* 16px → 18px */
   line-height: 1.6;
 }
 
-small,
 span {
   font-size: clamp(0.875rem, 1vw, 0.95rem);
-  /* 14px → 15px */
+}
+
+small {
+  font-size: clamp(0.75rem, 0.75vw, 0.75rem);
 }
 
 a {
