@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
-import { Product } from "@/utils/types";
+import { Product } from "@prisma/client";
 
 export interface CartItem extends Product {
     quantity: number;
