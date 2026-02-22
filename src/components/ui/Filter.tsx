@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Range } from 'react-range';
 import { Product } from '@prisma/client';
 
@@ -12,49 +12,38 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories = [] }) => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [subcategories, setSubcategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
-
-  useEffect(() => {
-    if (products.length > 0) {
-      const prices = products.map((p) => p.price);
-      const min = Math.min(...prices);
-      const max = Math.max(...prices);
-
-      // Only update state if values actually need to change
-      setMinPrice(prev => prev !== min ? min : prev);
-      setMaxPrice(prev => prev !== max ? max : prev);
-
-      // Reset price range if products changed significantly (optional, maybe keep user selection if valid)
-      // For now, let's only expand range if needed, but not shrink if user selected subset (complex logic).
-      // Simpler: Just sync range boundaries to min/max if current selection is out of bounds or on init.
-      setPriceRange(prev => [
-          Math.max(min, prev[0]),
-          Math.min(max, prev[1])
-      ]);
-      // Actually, better to reset to full range if product set changes completely (like jumping categories),
-      // but here we are in Shop page, so product set is ALL.
-      // If we filter, products prop might filter down? No, ShopClient passes ALL products to Filter usually?
-      // Ah, ShopClient filters products based on its own state. Filter component receives... what?
-      // In ShopClient: <Filter ... products={products} /> where products is the initial FULL list.
-      // So products prop never changes in ShopClient unless DB updates.
-      // So this effect runs once.
-      setPriceRange([min, max]);
-
-      const uniqueSubcategories = Array.from(
-        new Set(products.map((p) => p.subcategory))
-      );
-      setSubcategories(uniqueSubcategories);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
+  const { productsMin, productsMax, uniqueSubcategories } = useMemo(() => {
+    if (products.length === 0) {
+      return { productsMin: 0, productsMax: 1000, uniqueSubcategories: [] };
     }
+    const prices = products.map((p) => p.price);
+    return {
+      productsMin: Math.min(...prices),
+      productsMax: Math.max(...prices),
+      uniqueSubcategories: Array.from(new Set(products.map((p) => p.subcategory)))
+    };
   }, [products]);
+
+  // Sync minPrice/maxPrice with products list
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMinPrice(productsMin);
+    setMaxPrice(productsMax);
+    setSubcategories(uniqueSubcategories);
+
+    // Reset price range to full if products change (e.g. initial load)
+    setPriceRange([productsMin, productsMax]);
+  }, [productsMin, productsMax, uniqueSubcategories]);
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
-      onFilterChange({ 
-        priceRange, 
+      onFilterChange({
+        priceRange,
         subcategories: selectedSubcategories,
         categories: selectedCategories
       });
@@ -98,25 +87,25 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
 
       {/* Categories Filter - Only render if allCategories provided */}
       {allCategories.length > 0 && (
-          <div className="mb-6">
-              <p className="font-semibold mb-2">Categories</p>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {allCategories.map((category) => (
-                      <div key={category} className="flex items-center">
-                          <input
-                              type="checkbox"
-                              id={`cat-${category}`}
-                              checked={selectedCategories.includes(category)}
-                              onChange={() => handleCategoryChange(category)}
-                              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                          <label htmlFor={`cat-${category}`} className="ml-2 text-gray-600">
-                              {category}
-                          </label>
-                      </div>
-                  ))}
+        <div className="mb-6">
+          <p className="font-semibold mb-2">Categories</p>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {allCategories.map((category) => (
+              <div key={category} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`cat-${category}`}
+                  checked={selectedCategories.includes(category)}
+                  onChange={() => handleCategoryChange(category)}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor={`cat-${category}`} className="ml-2 text-gray-600">
+                  {category}
+                </label>
               </div>
+            ))}
           </div>
+        </div>
       )}
 
       <div>
@@ -130,7 +119,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
             values={priceRange}
             onChange={handlePriceChange}
             renderTrack={({ props, children }) => {
-              const { key, ...restProps } = props as any;
+              const { key, ...restProps } = props;
               return (
                 <div
                   key={key}
@@ -142,7 +131,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
               );
             }}
             renderThumb={({ props }) => {
-              const { key, ...restProps } = props as any;
+              const { key, ...restProps } = props;
               return (
                 <div
                   key={key}
@@ -158,7 +147,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
           </div>
         </div>
       </div>
-      
+
       <div className="mt-6">
         <p className="font-semibold mb-2">Subcategory</p>
 

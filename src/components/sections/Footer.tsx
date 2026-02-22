@@ -11,7 +11,7 @@ export default async function Footer() {
         }
     });
 
-    const getContent = (key: string) => uiContent.find((c: any) => c.key === key)?.value || "";
+    const getContent = (key: string) => uiContent.find((c) => c.key === key)?.value || "";
 
     const socialLinks = [
         { icon: Facebook, href: getContent("social_facebook"), label: "Facebook" },
@@ -35,10 +35,10 @@ export default async function Footer() {
 
                     <div className="flex space-x-4">
                         {socialLinks.map((social, idx) => (
-                            <Link 
-                                key={idx} 
-                                href={social.href} 
-                                target="_blank" 
+                            <Link
+                                key={idx}
+                                href={social.href}
+                                target="_blank"
                                 className="hover:text-blue-500 transition-colors bg-gray-800 p-2 rounded-lg"
                                 aria-label={social.label}
                             >
@@ -51,7 +51,7 @@ export default async function Footer() {
                 {/* Quick Links */}
                 <div>
                     <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Quick Links</h5>
-                    
+
                     <ul className="space-y-2">
                         <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
                         <li><Link href="/shop" className="hover:text-blue-400 transition-colors">Shop All</Link></li>
@@ -63,7 +63,7 @@ export default async function Footer() {
                 {/* Categories */}
                 <div>
                     <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Categories</h5>
-                    
+
                     <ul className="space-y-2">
                         <li><Link href="/shop?category=Computers" className="hover:text-blue-400 transition-colors">Computers</Link></li>
                         <li><Link href="/shop?category=Wearables" className="hover:text-blue-400 transition-colors">Wearables</Link></li>
@@ -75,7 +75,7 @@ export default async function Footer() {
                 {/* Contact Info */}
                 <div>
                     <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">Contact Us</h5>
-                    
+
                     <ul className="space-y-2">
                         <li className="flex items-center space-x-3">
                             <MapPin size={18} className="text-blue-500 shrink-0" />

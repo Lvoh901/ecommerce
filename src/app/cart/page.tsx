@@ -48,7 +48,7 @@ export default function CartPage() {
                                 category,
                                 price,
                                 quantity
-                            } = item as any;
+                            } = item;
 
                             return (
                                 <div key={id} className="bg-white rounded-2xl shadow-sm p-6 flex gap-6 items-center hover:shadow-md transition-shadow">

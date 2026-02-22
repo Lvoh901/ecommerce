@@ -11,15 +11,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const uiContent = await prisma.uIContent.findMany();
-  
-  const getContent = (key: string) => uiContent.find((c: any) => c.key === key)?.value || "";
-  
+
+  const getContent = (key: string) => uiContent.find((c) => c.key === key)?.value || "";
+
   const heroContent = {
-      title: getContent("hero_title"),
-      subtitle: getContent("hero_subtitle"),
-      description: getContent("hero_description"),
-      btnExplore: getContent("btn_explore"),
-      btnAbout: getContent("btn_about"),
+    title: getContent("hero_title"),
+    subtitle: getContent("hero_subtitle"),
+    description: getContent("hero_description"),
+    btnExplore: getContent("btn_explore"),
+    btnAbout: getContent("btn_about"),
   };
 
   return (
