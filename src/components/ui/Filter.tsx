@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Range } from 'react-range';
-import { Product } from '@prisma/client';
+import type { Product } from '@prisma/client';
 
 interface FilterProps {
   onFilterChange: (filters: { priceRange: number[]; subcategories: string[]; categories?: string[] }) => void;
@@ -17,6 +17,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
   const [subcategories, setSubcategories] = useState<string[]>([]);
+  const lastSent = useRef<string>("");
   const { productsMin, productsMax, uniqueSubcategories } = useMemo(() => {
     if (products.length === 0) {
       return { productsMin: 0, productsMax: 1000, uniqueSubcategories: [] };
@@ -42,6 +43,16 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
+      // Only notify when values actually changed — the parent passes a new
+      // callback identity on every render, so an unconditional call would
+      // ping-pong setState forever (infinite re-render loop).
+      const snapshot = JSON.stringify({
+        priceRange,
+        subcategories: selectedSubcategories,
+        categories: selectedCategories,
+      });
+      if (lastSent.current === snapshot) return;
+      lastSent.current = snapshot;
       onFilterChange({
         priceRange,
         subcategories: selectedSubcategories,
@@ -119,11 +130,9 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
             values={priceRange}
             onChange={handlePriceChange}
             renderTrack={({ props, children }) => {
-              const { key, ...restProps } = props;
               return (
                 <div
-                  key={key}
-                  {...restProps}
+                  {...props}
                   className="w-full h-2 bg-gray-200 rounded-full"
                 >
                   {children}
@@ -131,11 +140,9 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories
               );
             }}
             renderThumb={({ props }) => {
-              const { key, ...restProps } = props;
               return (
                 <div
-                  key={key}
-                  {...restProps}
+                  {...props}
                   className="w-5 h-5 bg-blue-500 rounded-full"
                 />
               );

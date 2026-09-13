@@ -1,11 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Navigation from "@/components/sections/Navigation";
-import Footer from "@/components/sections/Footer";
 import ProductCard from "@/components/ui/ProductCard";
 import Filter from "@/components/ui/Filter";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
 
 interface FiltersType {
   priceRange: [number, number];
@@ -73,10 +71,8 @@ export default function CategoryClient({ products, slug }: { products: Product[]
   }, [products, filters, sortBy]);
 
   return (
-    <div>
-      <Navigation />
-      <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl capitalize text-center">
             {slug.replace(/-/g, " ")}
           </h1>
@@ -120,7 +116,5 @@ export default function CategoryClient({ products, slug }: { products: Product[]
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
   );
 }

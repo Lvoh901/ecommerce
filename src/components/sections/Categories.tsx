@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Category } from "@prisma/client";
+import type { Category } from "@prisma/client";
 
 interface CategoriesProps {
     categories: Category[];

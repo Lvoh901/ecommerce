@@ -2,6 +2,7 @@
 import { CircleCheck, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import { notify } from "@/lib/notify";
 
 export default function CTA() {
     const [email, setEmail] = useState("");
@@ -16,18 +17,31 @@ export default function CTA() {
         }
     }, [submitted]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically handle the form submission, e.g., send the email to your backend
-        console.log(`Email submitted: ${email}`);
-        setSubmitted(true);
-        setEmail("");
+        try {
+            const res = await fetch("/api/subscribers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                notify.error("Subscription failed", data.error || "Please try again.");
+                return;
+            }
+            setSubmitted(true);
+            setEmail("");
+            notify.toast("Subscribed! Watch your inbox for 10% off.");
+        } catch {
+            notify.error("Subscription failed", "Network error. Please try again.");
+        }
     };
 
     return (
         <div className="flex justify-center">
             <section
-                className="bg-gradient-to-br from-gray-900 via-gray-800 to-[#2e2a25] rounded-3xl p-4 sm:p-8 md:p-12 m-3 md:m-8 mx-auto container shadow-lg overflow-hidden relative"
+                className="bg-[#0b1120] rounded-3xl p-4 sm:p-8 md:p-12 m-3 md:m-8 mx-auto container shadow-[0_30px_80px_-20px_rgba(255,69,0,0.4)] overflow-hidden relative border border-white/10"
                 style={{
                     backgroundImage: `url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z3JhZGllbnR8ZW58MHx8MHx8fDA%3D')`,
                     backgroundSize: 'cover',
@@ -35,11 +49,13 @@ export default function CTA() {
                 }}
             >
                 <div className="absolute inset-0 bg-black/60 z-0"></div>
+                <div className="absolute inset-0 tech-grid-dark opacity-70 z-0 pointer-events-none"></div>
+                <div className="absolute -top-20 right-10 w-80 h-80 bg-[#FF4500]/15 blur-[110px] rounded-full z-0 pointer-events-none"></div>
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-6 md:gap-12">
                     {/* Left -- Content */}
                     <div className="flex flex-col justify-center items-start px-2 py-6">
                         <div className="flex gap-2 items-center">
-                            <h2 className="font-extrabold mb-4 leading-tight transition-all bg-gradient-to-r from-[#FF4500] to-orange-300 bg-clip-text text-transparent">
+                            <h2 className="font-extrabold mb-4 leading-tight transition-all text-[#FF4500]">
                                 Get 10% OFF
                             </h2>
 
@@ -69,7 +85,7 @@ export default function CTA() {
                             />
                             <button
                                 type="submit"
-                                className="bg-[#FF4500] hover:bg-[#d04000] text-white font-bold px-6 py-3 rounded-lg transition disabled:opacity-70 disabled:cursor-not-allowed shadow-lg flex items-center justify-center"
+                                className="btn-primary text-white font-bold px-6 py-3 rounded-lg transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                                 disabled={submitted || !email}
                                 aria-label="Subscribe to newsletter"
                             >

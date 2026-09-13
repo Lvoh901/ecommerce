@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
+import { notify } from "@/lib/notify";
 
 export interface CartItem extends Product {
     quantity: number;
@@ -50,6 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
             return [...prev, { ...product, quantity: 1 }];
         });
+        notify.toast(`${product.name} added to cart`);
     };
 
     const removeFromCart = (productId: number) => {

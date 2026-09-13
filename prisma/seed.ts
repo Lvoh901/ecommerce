@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { hash } from 'bcryptjs'
 import { products, footerContent } from './seed-data'
 
 const prisma = new PrismaClient()
@@ -76,8 +77,28 @@ async function main() {
     console.log('Seeding completed.')
 }
 
+async function seedAdmin() {
+    const existing = await prisma.user.count()
+    if (existing > 0) {
+        console.log('Users already exist, skipping admin seed.')
+        return
+    }
+    const email = process.env.ADMIN_EMAIL || 'admin@konnecttech.com'
+    const password = process.env.ADMIN_PASSWORD || 'Admin123!'
+    await prisma.user.create({
+        data: {
+            name: 'Store Admin',
+            email,
+            passwordHash: await hash(password, 12),
+            role: 'ADMIN',
+        },
+    })
+    console.log(`Admin user created: ${email}`)
+}
+
 main()
     .then(async () => {
+        await seedAdmin()
         await prisma.$disconnect()
     })
     .catch(async (e) => {

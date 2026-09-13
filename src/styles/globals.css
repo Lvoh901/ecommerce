@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-neon: #ff4500;
+  --color-neon-soft: #ff6a2b;
+  --color-void: #05070f;
+  --color-panel: #0b1120;
+  --font-display: "Orbitron", sans-serif;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -59,7 +67,7 @@ h5 {
 }
 
 p {
-  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  font-size: clamp(1.25rem, 1.25vw, 1.25rem);
   line-height: 1.6;
 }
 
@@ -85,6 +93,189 @@ li {
 /* typography */
 
 /* custom button */
+/* ---------- KonnectTech futuristic layer (visual only) ---------- */
+
+::selection {
+  background: rgba(255, 69, 0, 0.85);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff4500;
+}
+
+/* Solid brand-orange headline text */
+.text-brand {
+  color: #ff4500;
+}
+
+.text-glow {
+  text-shadow: 0 0 24px rgba(255, 69, 0, 0.45);
+}
+
+/* Subtle blueprint grid for light sections */
+.tech-grid {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Blueprint grid for dark surfaces */
+.tech-grid-dark {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Frosted glass surfaces */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.glass-dark {
+  background: rgba(11, 17, 32, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Primary CTA: solid ember orange + glow */
+.btn-primary {
+  background: #ff4500;
+  box-shadow: 0 8px 28px -8px rgba(255, 69, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.07);
+  box-shadow: 0 12px 36px -8px rgba(255, 69, 0, 0.8), 0 0 0 1px rgba(255, 69, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Card lift with ember glow */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 50px -16px rgba(255, 69, 0, 0.35), 0 8px 24px -12px rgba(2, 6, 23, 0.25);
+  border-color: rgba(255, 69, 0, 0.35);
+}
+
+/* Neon focus ring for inputs */
+.field-glow:focus {
+  outline: none;
+  border-color: #ff4500;
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.18), 0 0 18px rgba(34, 211, 238, 0.12);
+}
+
+/* Thin solid divider line */
+.hairline {
+  background: rgba(255, 69, 0, 0.55);
+  height: 1px;
+}
+
+/* Eyebrow chip for section labels */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ff4500;
+  background: rgba(255, 69, 0, 0.08);
+  border: 1px solid rgba(255, 69, 0, 0.25);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ff4500;
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.9);
+}
+
+/* Floating orbs */
+@keyframes drift {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(24px, -28px, 0) scale(1.08);
+  }
+}
+
+.animate-drift {
+  animation: drift 9s ease-in-out infinite;
+}
+
+@keyframes grid-pan {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 56px 28px;
+  }
+}
+
+.animate-grid-pan {
+  animation: grid-pan 14s linear infinite;
+}
+
+/* Pulsing status dot */
+@keyframes ping-soft {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.55);
+  }
+
+  70% {
+    box-shadow: 0 0 0 9px rgba(34, 211, 238, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+  }
+}
+
+.pulse-dot {
+  animation: ping-soft 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-drift,
+  .animate-grid-pan,
+  .pulse-dot {
+    animation: none;
+  }
+}
+
 .custom-btn {
   font-size: 13px;
   color: #6b777c;

@@ -3,7 +3,7 @@
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import { Star } from "lucide-react";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
 
 const Rating = ({ rating }: { rating: number }) => {
   const stars = [];
