@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -103,12 +103,22 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-sm text-gray-500 text-center">
+        <p className="mt-6 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#FF4500] font-semibold hover:underline">
+          <Link href="/login" className="font-semibold text-[#FF4500] hover:underline">
             Sign in
           </Link>
         </p>
+
+        <div className="mt-4 flex justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition-colors hover:text-[#FF4500]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to store
+          </Link>
+        </div>
       </div>
     </main>
   );

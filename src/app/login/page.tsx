@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { LogIn } from "lucide-react";
+import { ArrowLeft, LogIn } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -54,22 +54,20 @@ function LoginForm() {
   }
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center bg-gray-50 px-4 overflow-hidden">
+    <main className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-gray-50 px-4 py-10 lg:min-h-screen">
       <div className="absolute inset-0 tech-grid opacity-70 pointer-events-none"></div>
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#FF4500]/15 blur-[110px] rounded-full pointer-events-none"></div>
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#FF4500]/10 blur-[110px] rounded-full pointer-events-none"></div>
       <div className="relative bg-white/90 backdrop-blur rounded-3xl shadow-[0_30px_70px_-20px_rgba(255,69,0,0.3)] border border-white/60 p-8 w-full max-w-md">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#FF4500]/10 border border-[#FF4500]/20 shadow-[0_0_20px_rgba(255,69,0,0.25)]">
-            <LogIn className="w-7 h-7 text-[#FF4500]" />
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#FF4500]/20 bg-[#FF4500]/10 shadow-[0_0_20px_rgba(255,69,0,0.25)]">
+            <LogIn className="h-6 w-6 text-[#FF4500]" />
           </div>
-
-          <h2 className="font-bold text-gray-900">Welcome back</h2>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Welcome back</h1>
+            <p className="text-sm text-gray-500">Sign in to your KonnectTech account.</p>
+          </div>
         </div>
-
-        <p className="font-medium mb-6 text-center">
-          Sign in to your KonnectTech account.
-        </p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
@@ -131,12 +129,13 @@ function LoginForm() {
           </Link>
         </p>
 
-        <div className="flex justify-center">
+        <div className="mt-5 flex justify-center">
           <Link
             href="/"
-            className="mt-3 text-white bg-gray-500 py-1 px-2.5 hover:bg-gray-700 rounded-md"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition-colors hover:text-[#FF4500]"
           >
-            Go Back Home
+            <ArrowLeft className="h-4 w-4" />
+            Back to store
           </Link>
         </div>
       </div>

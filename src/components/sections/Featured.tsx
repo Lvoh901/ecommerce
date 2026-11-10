@@ -4,62 +4,81 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 
 export default async function Featured() {
-    const categories = await prisma.category.findMany();
+    const [categories, products] = await Promise.all([
+        prisma.category.findMany({ orderBy: { name: "asc" } }),
+        prisma.product.findMany({ select: { category: true } }),
+    ]);
+
+    const productCategories = Array.from(new Set(products.map((p) => p.category)));
+
+    // Marketing categories don't always match a product category name exactly,
+    // so resolve the closest real category for a working filter link.
+    const linkFor = (name: string, fallback: string) => {
+        const lower = name.toLowerCase();
+        const match =
+            productCategories.find((c) => c.toLowerCase() === lower) ||
+            productCategories.find((c) => lower.includes(c.toLowerCase()));
+        return match ? `/shop?category=${encodeURIComponent(match)}` : fallback;
+    };
 
     return (
-        <div className="relative bg-gray-100 py-16 overflow-hidden">
-            <div className="absolute inset-0 tech-grid opacity-70 pointer-events-none"></div>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[36rem] h-56 bg-[#FF4500]/10 blur-[100px] rounded-full pointer-events-none"></div>
-            <div className="relative container mx-auto px-4">
-                <div className="flex flex-col items-center gap-3 mb-8">
-                    <span className="eyebrow">Curated lineup</span>
-                    <h4 className="text-center font-extrabold tracking-wide">
-                        <span className="text-brand">Featured Products</span>
-                    </h4>
+        <section className="relative overflow-hidden bg-gray-50 py-12 sm:py-16 lg:py-20">
+            <div className="pointer-events-none absolute inset-0 tech-grid opacity-70" />
+            <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-[#FF4500]/10 blur-[100px]" />
+
+            <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <span className="eyebrow mb-3">Curated lineup</span>
+                        <h2 className="font-extrabold text-gray-900">
+                            Shop by <span className="text-brand">category</span>
+                        </h2>
+                        <p className="mt-1 max-w-xl text-sm text-gray-600 sm:text-base">
+                            Every category is stocked with gadgets we&apos;ve checked in-store before they ship.
+                        </p>
+                    </div>
+                    <Link
+                        href="/shop"
+                        className="group inline-flex shrink-0 items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-gray-800 transition-colors hover:border-[#FF4500]/50 hover:text-[#FF4500]"
+                    >
+                        View all products
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-                    {categories.map((product, idx) => (
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                    {categories.slice(0, 8).map((category, idx) => (
                         <Link
-                            href={product.link}
-                            key={product.name}
-                            className={`
-                                group relative flex flex-col justify-end items-center h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_24px_50px_-16px_rgba(255,69,0,0.45)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[#FF4500]/50
-                            `}
+                            href={linkFor(category.name, category.link)}
+                            key={category.id}
+                            className="group relative flex h-44 flex-col justify-end overflow-hidden rounded-2xl border border-gray-200 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#FF4500]/50 hover:shadow-[0_24px_50px_-24px_rgba(255,69,0,0.45)] sm:h-56 lg:h-64"
                         >
-                            {/* Background Image */}
-                            <div className="absolute inset-0 w-full h-full">
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
-                                    sizes="(min-width: 1024px) 320px, (min-width: 768px) 50vw, 100vw"
-                                    priority={idx < 4}
-                                />
-                                {/* Overlay */}
-                                <div className="absolute inset-0 bg-black/50"></div>
-                                <div className="absolute inset-x-0 top-0 hairline opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            </div>
-                            {/* Card Content */}
-                            <div className="relative z-10 w-full flex flex-col items-center text-center p-6">
-                                <h4 className="font-semibold mb-1 text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.60)]">{product.name}</h4>
+                            <Image
+                                src={category.image}
+                                alt={category.name}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                sizes="(min-width: 1024px) 300px, 45vw"
+                                priority={idx < 4}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#05070f]/90 via-[#05070f]/40 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 hairline opacity-0 transition-opacity group-hover:opacity-100" />
 
-                                <p className="text-gray-200 mb-2">
-                                    From: <b className="text-brand italic">Ksh.{product.fromPrice}</b>
+                            <div className="relative z-10 p-3.5 sm:p-5">
+                                <p className="font-['Orbitron'] text-sm font-bold leading-tight text-white sm:text-base">
+                                    {category.name}
                                 </p>
+                                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-gray-300 sm:text-xs">
+                                    From <span className="text-[#FF4500]">Ksh.{category.fromPrice.toLocaleString()}</span>
+                                </p>
+                                <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-white/80 opacity-0 transition-opacity group-hover:opacity-100">
+                                    Shop now <ArrowRight className="h-3 w-3" />
+                                </span>
                             </div>
                         </Link>
                     ))}
                 </div>
-
-                <div className="flex justify-center">
-                    <Link href="/shop" className="custom-btn pt-12 flex items-center gap-2 text-lg font-bold">
-                        View All Products{" "}
-                        <ArrowRight className="w-5 h-5 text-[#FF4500] font-bold" />
-                    </Link>
-                </div>
             </div>
-        </div>
-    )
+        </section>
+    );
 }

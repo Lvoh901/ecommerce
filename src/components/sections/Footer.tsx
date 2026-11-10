@@ -8,19 +8,29 @@ import {
   Mail,
   Phone,
   MapPin,
+  Wrench,
+  Truck,
+  ShieldCheck,
 } from "lucide-react";
 
 export default async function Footer() {
-  const uiContent = await prisma.uIContent.findMany({
-    where: {
-      group: {
-        in: ["footer", "contact", "social"],
+  const [uiContent, products] = await Promise.all([
+    prisma.uIContent.findMany({
+      where: {
+        group: {
+          in: ["footer", "contact", "social"],
+        },
       },
-    },
-  });
+    }),
+    prisma.product.findMany({ select: { category: true } }),
+  ]);
 
   const getContent = (key: string) =>
     uiContent.find((c) => c.key === key)?.value || "";
+
+  const categories = Array.from(new Set(products.map((p) => p.category)))
+    .sort()
+    .slice(0, 6);
 
   const socialLinks = [
     { icon: Facebook, href: getContent("social_facebook"), label: "Facebook" },
@@ -34,157 +44,160 @@ export default async function Footer() {
   ].filter((s) => s.href);
 
   return (
-    <footer className="relative bg-[#05070f] text-gray-300 pt-16 pb-8 px-4 sm:px-6 lg:px-8 mt-20 rounded-t-[3rem] border-t border-white/10 overflow-hidden">
-            <div className="absolute inset-x-0 top-0 hairline"></div>
-      <div className="absolute inset-0 tech-grid-dark opacity-60 pointer-events-none"></div>
-      <div className="absolute -top-24 left-1/3 w-96 h-64 bg-[#FF4500]/15 blur-[110px] rounded-full pointer-events-none"></div>
-      <div className="relative container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-        {/* Brand Section */}
-        <div className="space-y-6">
-          <h5 className="font-bold tracking-wider">
-                        <span className="text-brand">KonnectTech</span>
-          </h5>
+    <footer className="relative mt-14 overflow-hidden rounded-t-[2rem] border-t border-white/10 bg-[#05070f] px-4 pb-10 pt-12 text-gray-300 sm:px-6 sm:pt-16 lg:px-8">
+      <div className="absolute inset-x-0 top-0 hairline"></div>
+      <div className="pointer-events-none absolute inset-0 tech-grid-dark opacity-60"></div>
+      <div className="pointer-events-none absolute -top-24 left-1/3 h-64 w-96 rounded-full bg-[#FF4500]/15 blur-[110px]"></div>
 
-          <p className="text-gray-400 leading-relaxed max-w-xs">
-            {getContent("footer_description") ||
-              "Your one-stop shop for premium gadgets and accessories. Experience the future of tech shopping."}
-          </p>
+      <div className="relative mx-auto max-w-7xl">
+        {/* Promise strip */}
+        <div className="mb-10 grid grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-3">
+          {[
+            { icon: Truck, title: "Free Nairobi delivery", copy: "Same-day within the CBD" },
+            { icon: ShieldCheck, title: "Verified quality", copy: "Every gadget checked in-store" },
+            { icon: Wrench, title: "Repair support", copy: "Expert fixes for what you own" },
+          ].map((item) => (
+            <div key={item.title} className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF4500]/15 text-[#FF4500]">
+                <item.icon className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-sm font-bold text-white">{item.title}</p>
+                <p className="text-xs text-gray-400">{item.copy}</p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <div className="flex space-x-4">
-            {socialLinks.map((social, idx) => (
-              <Link
-                key={idx}
-                href={social.href}
-                target="_blank"
-                className="hover:text-blue-500 transition-colors bg-gray-800 p-2 rounded-lg"
-                aria-label={social.label}
-              >
-                <social.icon size={20} />
-              </Link>
-            ))}
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+          {/* Brand */}
+          <div className="col-span-2 space-y-5 lg:col-span-1">
+            <Link href="/" className="inline-flex items-center gap-2.5" aria-label="KonnectTech home">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#FF4500] text-lg font-extrabold text-white">
+                K
+              </span>
+              <span className="font-['Orbitron'] text-sm font-extrabold tracking-widest text-white">
+                KONNECT<span className="text-brand">TECH</span>
+              </span>
+            </Link>
+
+            <p className="max-w-xs text-sm leading-relaxed text-gray-400">
+              {getContent("footer_description") ||
+                "Your one-stop shop for premium gadgets and accessories. Experience the future of tech shopping."}
+            </p>
+
+            <div className="flex gap-3">
+              {socialLinks.map((social, idx) => (
+                <Link
+                  key={idx}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg bg-white/5 p-2 text-gray-400 transition-colors hover:bg-[#FF4500]/15 hover:text-[#FF4500]"
+                  aria-label={social.label}
+                >
+                  <social.icon size={18} />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Shop by category */}
+          <div>
+            <h5 className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white">Shop</h5>
+            <ul className="space-y-2.5 text-sm">
+              {categories.map((category) => (
+                <li key={category}>
+                  <Link
+                    href={`/shop?category=${encodeURIComponent(category)}`}
+                    className="text-gray-400 transition-colors hover:text-[#FF4500]"
+                  >
+                    {category}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/shop" className="font-bold text-white transition-colors hover:text-[#FF4500]">
+                  All products &rarr;
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h5 className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white">Company</h5>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/about" className="text-gray-400 transition-colors hover:text-[#FF4500]">
+                  About us
+                </Link>
+              </li>
+              <li>
+                <Link href="/book-service" className="text-gray-400 transition-colors hover:text-[#FF4500]">
+                  Book a repair
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-400 transition-colors hover:text-[#FF4500]">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/cart" className="text-gray-400 transition-colors hover:text-[#FF4500]">
+                  My cart
+                </Link>
+              </li>
+              <li>
+                <Link href="/orders" className="text-gray-400 transition-colors hover:text-[#FF4500]">
+                  Track an order
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="col-span-2 lg:col-span-1">
+            <h5 className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white">Contact</h5>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin size={16} className="mt-0.5 shrink-0 text-[#FF4500]" />
+                <span className="text-gray-400">
+                  {getContent("contact_address") || "Tech Plaza, Nairobi, Kenya"}
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Phone size={16} className="mt-0.5 shrink-0 text-[#FF4500]" />
+                <a
+                  href={`tel:${getContent("contact_phone")}`}
+                  className="text-gray-400 transition-colors hover:text-[#FF4500]"
+                >
+                  {getContent("contact_phone") || "+254 712 345 678"}
+                </a>
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail size={16} className="mt-0.5 shrink-0 text-[#FF4500]" />
+                <a
+                  href={`mailto:${getContent("contact_email")}`}
+                  className="break-all text-gray-400 transition-colors hover:text-[#FF4500]"
+                >
+                  {getContent("contact_email") || "support@konnecttech.com"}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div>
-          <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">
-            Quick Links
-          </h5>
-
-          <ul className="space-y-2">
-            <li>
-              <Link href="/" className="hover:text-blue-400 transition-colors">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop"
-                className="hover:text-blue-400 transition-colors"
-              >
-                Shop All
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/about"
-                className="hover:text-blue-400 transition-colors"
-              >
-                About Us
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/cart"
-                className="hover:text-blue-400 transition-colors"
-              >
-                My Cart
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Categories */}
-        <div>
-          <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">
-            Categories
-          </h5>
-
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/shop?category=Computers"
-                className="hover:text-blue-400 transition-colors"
-              >
-                Computers
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop?category=Wearables"
-                className="hover:text-blue-400 transition-colors"
-              >
-                Wearables
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop?category=Gaming Gear"
-                className="hover:text-blue-400 transition-colors"
-              >
-                Gaming Gear
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop?category=Cameras"
-                className="hover:text-blue-400 transition-colors"
-              >
-                Cameras
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Contact Info */}
-        <div>
-          <h5 className="font-bold text-white mb-4 uppercase tracking-wider underline underline-offset-4">
-            Contact Us
-          </h5>
-
-          <ul className="space-y-2">
-            <li className="flex items-center space-x-3">
-              <MapPin size={18} className="text-blue-500 shrink-0" />
-              <span>{getContent("contact_address") || "Nairobi, Kenya"}</span>
-            </li>
-            <li className="flex items-center space-x-3">
-              <Phone size={18} className="text-blue-500 shrink-0" />
-              <span>{getContent("contact_phone") || "+254 700 000000"}</span>
-            </li>
-            <li className="flex items-center space-x-3">
-              <Mail size={18} className="text-blue-500 shrink-0" />
-              <Link
-                href={`mailto:${getContent("contact_email")}`}
-                className="hover:text-blue-400 transition-colors"
-              >
-                {getContent("contact_email") || "hello@konnecttech.com"}
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-800 mt-16 pt-8 text-center text-sm text-gray-500">
-        <p>
-          &copy; {new Date().getFullYear()} KonnectTech. All rights reserved.
-        </p>
-        <div className="mt-2 space-x-4">
-          <Link href="#" className="hover:text-gray-300">
-            Privacy Policy
-          </Link>
-          <Link href="#" className="hover:text-gray-300">
-            Terms of Service
-          </Link>
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-gray-500 sm:flex-row">
+          <p>&copy; {new Date().getFullYear()} KonnectTech. All rights reserved.</p>
+          <div className="flex gap-5">
+            <Link href="#" className="transition-colors hover:text-gray-300">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="transition-colors hover:text-gray-300">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

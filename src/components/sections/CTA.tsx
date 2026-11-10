@@ -54,15 +54,9 @@ export default function CTA() {
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-6 md:gap-12">
                     {/* Left -- Content */}
                     <div className="flex flex-col justify-center items-start px-2 py-6">
-                        <div className="flex gap-2 items-center">
-                            <h2 className="font-extrabold mb-4 leading-tight transition-all text-[#FF4500]">
-                                Get 10% OFF
-                            </h2>
-
-                            <h2 className="text-white font-extrabold mb-4 leading-tight transition-all">
-                                your first order!
-                            </h2>
-                        </div>
+                        <h2 className="mb-4 font-extrabold leading-tight text-white">
+                            Get <span className="text-[#FF4500]">10% OFF</span> your first order!
+                        </h2>
 
                         <p className="text-gray-200 text-base sm:text-lg mb-6">
                             Subscribe to our newsletter and be the first to know about exclusive offers, new arrivals, and community events!

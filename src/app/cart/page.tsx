@@ -46,7 +46,7 @@ export default function CartPage() {
 
     if (orderId !== null) {
         return (
-            <main className="flex-grow flex flex-col items-center justify-center pt-28 pb-16 px-4 text-center">
+            <main className="flex-grow flex flex-col items-center justify-center py-10 sm:py-14 px-4 text-center">
                 <div className="bg-white p-12 rounded-3xl shadow-lg max-w-lg w-full">
                     <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
                     <h4 className="font-bold text-gray-900 mb-4 text-xl">Order #{orderId} placed!</h4>
@@ -66,7 +66,7 @@ export default function CartPage() {
 
     if (cart.length === 0) {
         return (
-            <main className="flex-grow flex flex-col items-center justify-center pt-28 pb-16 px-4 text-center">
+            <main className="flex-grow flex flex-col items-center justify-center py-10 sm:py-14 px-4 text-center">
                 <div className="bg-white p-12 rounded-3xl shadow-lg max-w-lg w-full">
                     <div className="w-16 h-16 bg-gray-100 border border-[#FF4500] rounded-full flex items-center justify-center mx-auto mb-6">
                         <ShoppingBag className="w-10 h-10 text-[#FF4500]" />
@@ -87,15 +87,23 @@ export default function CartPage() {
     }
 
     return (
-        <main className="pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="font-bold text-gray-900 mb-10 font-['Orbitron'] border-b pb-4">
-                    Your Shopping Cart <span className="text-lg text-gray-500 font-normal ml-2">({totalItems} items)</span>
-                </h1>
+                <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
+                    <div>
+                        <h1 className="font-bold text-gray-900 font-['Orbitron']">
+                            Your Cart <span className="text-base font-normal text-gray-500">({totalItems} {totalItems === 1 ? "item" : "items"})</span>
+                        </h1>
+                        <p className="mt-1 text-sm text-gray-500">Review your items, then check out in a few seconds.</p>
+                    </div>
+                    <Link href="/shop" className="text-sm font-bold text-[#FF4500] hover:underline">
+                        Continue shopping →
+                    </Link>
+                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
                     {/* Cart Items */}
-                    <div className="lg:col-span-8 space-y-6">
+                    <div className="lg:col-span-8 space-y-4">
                         {cart.map((item) => {
                             const {
                                 id,
@@ -107,30 +115,33 @@ export default function CartPage() {
                             } = item;
 
                             return (
-                                <div key={id} className="bg-white rounded-2xl shadow-sm p-6 flex gap-6 items-center hover:shadow-md transition-shadow">
-                                    <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-100">
+                                <div key={id} className="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-5 flex flex-col xs:flex-row gap-4 xs:items-center xs:gap-5 transition-shadow hover:shadow-md">
+                                    <Link href={`/products/${id}`} className="relative h-40 xs:h-24 w-full xs:w-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-100">
                                         <Image
                                             src={image}
                                             alt={name}
                                             fill
+                                            sizes="(max-width: 480px) 100vw, 96px"
                                             className="object-cover"
                                         />
-                                    </div>
+                                    </Link>
 
-                                    <div className="flex-grow min-w-0">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <p className="text-xs text-[#FF4500] font-bold uppercase tracking-wider mb-1">{category}</p>
-                                                <h3 className="text-lg font-bold text-gray-900 truncate">{name}</h3>
+                                    <div className="flex-grow min-w-0 w-full">
+                                        <div className="flex justify-between items-start gap-3 mb-2">
+                                            <div className="min-w-0">
+                                                <p className="text-[11px] text-[#FF4500] font-bold uppercase tracking-wider mb-1">{category}</p>
+                                                <Link href={`/products/${id}`} className="block text-base sm:text-lg font-bold text-gray-900 leading-snug hover:text-[#FF4500] transition-colors">{name}</Link>
+                                                <p className="text-xs text-gray-500 mt-0.5">Ksh.{price.toLocaleString()} each</p>
                                             </div>
-                                            <p className="text-lg font-bold text-gray-900">Ksh.{price * quantity}</p>
+                                            <p className="shrink-0 text-base sm:text-lg font-extrabold text-gray-900">Ksh.{(price * quantity).toLocaleString()}</p>
                                         </div>
 
-                                        <div className="flex justify-between items-center mt-4">
+                                        <div className="flex flex-wrap justify-between items-center gap-3 mt-3">
                                             <div className="flex items-center bg-gray-100 rounded-lg p-1">
                                                 <button
                                                     onClick={() => updateQuantity(id, quantity - 1)}
-                                                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
+                                                    aria-label={`Decrease quantity of ${name}`}
+                                                    className="p-1.5 hover:bg-white rounded-md transition-colors text-gray-600 disabled:opacity-50"
                                                     disabled={quantity <= 1}
                                                 >
                                                     <Minus className="w-4 h-4" />
@@ -138,7 +149,8 @@ export default function CartPage() {
                                                 <span className="w-8 text-center font-bold text-gray-900">{quantity}</span>
                                                 <button
                                                     onClick={() => updateQuantity(id, quantity + 1)}
-                                                    className="p-1 hover:bg-white rounded-md transition-colors text-gray-600"
+                                                    aria-label={`Increase quantity of ${name}`}
+                                                    className="p-1.5 hover:bg-white rounded-md transition-colors text-gray-600"
                                                 >
                                                     <Plus className="w-4 h-4" />
                                                 </button>
@@ -146,7 +158,7 @@ export default function CartPage() {
 
                                             <button
                                                 onClick={() => removeFromCart(id)}
-                                                className="flex items-center text-red-500 hover:text-red-700 font-medium text-sm transition-colors group"
+                                                className="flex items-center text-red-500 hover:text-red-700 font-semibold text-xs transition-colors group"
                                             >
                                                 <Trash2 className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
                                                 Remove
@@ -160,8 +172,8 @@ export default function CartPage() {
 
                     {/* Order Summary */}
                     <div className="lg:col-span-4">
-                        <div className="bg-white rounded-2xl shadow-lg p-8 sticky top-32">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6 font-['Orbitron']">Order Summary</h3>
+                        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-lg p-5 sm:p-7 lg:sticky lg:top-28">
+                            <h3 className="text-lg font-bold text-gray-900 mb-5 font-['Orbitron']">Order Summary</h3>
 
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-gray-600">

@@ -59,16 +59,16 @@ export default function BookServiceForm() {
   }
 
   const input =
-    "block w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 focus:bg-white focus:ring-[#FF4500] focus:border-[#FF4500] outline-none transition-colors";
+    "block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-[#FF4500] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF4500]/20";
 
   return (
-    <div className="relative bg-white/90 backdrop-blur rounded-3xl shadow-[0_30px_70px_-20px_rgba(255,69,0,0.3)] border border-white/60 p-8">
+    <div className="relative rounded-3xl border border-gray-200 bg-white/95 p-5 shadow-[0_30px_70px_-30px_rgba(255,69,0,0.35)] backdrop-blur sm:p-8">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#FF4500]/10 border border-[#FF4500]/20 shadow-[0_0_20px_rgba(255,69,0,0.25)]">
           <Wrench className="w-7 h-7 text-[#FF4500]" />
         </div>
 
-        <h2 className="font-bold text-gray-900">Book a repair / service</h2>
+        <h1 className="text-2xl font-bold text-gray-900">Book a repair / service</h1>
       </div>
       <p className="text-gray-500 mb-6">
         Tell us about your device and we&apos;ll confirm your slot.

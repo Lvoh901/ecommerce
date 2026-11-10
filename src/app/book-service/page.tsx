@@ -9,9 +9,9 @@ export const metadata = {
 
 export default function BookServicePage() {
   return (
-    <div className="mt-8">
+    <div>
       <Navigation />
-      <main className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+      <main className="relative py-10 sm:py-14 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div className="absolute inset-0 tech-grid opacity-60 pointer-events-none"></div>
         <BookServiceForm />
       </main>

@@ -25,17 +25,20 @@ export default function WhyUs() {
   ];
 
   return (
-    <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       {/* subtle gradient/orange highlight */}
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF4500]/15 blur-[110px] rounded-full pointer-events-none z-0"></div>
       <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#ffb020]/10 blur-[110px] rounded-full pointer-events-none z-0"></div>
       {/* End gradients */}
 
       <div className="max-w-5xl mx-auto relative z-10">
-        <h3 className="font-bold text-gray-900 dark:text-white text-center mb-10 underline underline-offset-4 decoration-[#ff4500] tracking-wider font-['Orbitron']">
-          What Makes Us Unique?
-        </h3>
-        <ul className="grid gap-8 md:grid-cols-2">
+        <div className="mb-8 text-center sm:mb-10">
+          <span className="eyebrow mb-3">Why KonnectTech</span>
+          <h2 className="font-bold tracking-wider text-gray-900 dark:text-white">
+            What Makes Us Unique?
+          </h2>
+        </div>
+        <ul className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {highlights.map((item, idx) => (
             <li
               key={idx}
@@ -50,9 +53,9 @@ export default function WhyUs() {
                 <p className="font-semibold mb-1 text-[#ff4500] font-['Orbitron'] tracking-wide">
                   {item.title}
                 </p>
-                <span className="text-gray-700 dark:text-gray-200 font-medium text-sm">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   {item.desc}
-                </span>
+                </p>
               </div>
             </li>
           ))}

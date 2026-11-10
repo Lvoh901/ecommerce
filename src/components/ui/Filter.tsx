@@ -1,190 +1,167 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { Range } from 'react-range';
-import type { Product } from '@prisma/client';
+import { Range } from "react-range";
+import { SlidersHorizontal, X } from "lucide-react";
+import type { Product } from "@prisma/client";
 
-interface FilterProps {
-  onFilterChange: (filters: { priceRange: number[]; subcategories: string[]; categories?: string[] }) => void;
-  products: Product[];
-  allCategories?: string[];
+export interface ShopFilters {
+  priceRange: [number, number];
+  subcategories: string[];
+  categories: string[];
 }
 
-const Filter: React.FC<FilterProps> = ({ onFilterChange, products, allCategories = [] }) => {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000);
-  const [subcategories, setSubcategories] = useState<string[]>([]);
-  const lastSent = useRef<string>("");
-  const { productsMin, productsMax, uniqueSubcategories } = useMemo(() => {
-    if (products.length === 0) {
-      return { productsMin: 0, productsMax: 1000, uniqueSubcategories: [] };
-    }
-    const prices = products.map((p) => p.price);
-    return {
-      productsMin: Math.min(...prices),
-      productsMax: Math.max(...prices),
-      uniqueSubcategories: Array.from(new Set(products.map((p) => p.subcategory)))
-    };
-  }, [products]);
+interface FilterProps {
+  products: Product[];
+  allCategories: string[];
+  filters: ShopFilters;
+  onPriceChange: (range: [number, number]) => void;
+  onToggleCategory: (category: string) => void;
+  onToggleSubcategory: (subcategory: string) => void;
+  onClear: () => void;
+}
 
-  // Sync minPrice/maxPrice with products list
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMinPrice(productsMin);
-    setMaxPrice(productsMax);
-    setSubcategories(uniqueSubcategories);
+const Filter: React.FC<FilterProps> = ({
+  products,
+  allCategories,
+  filters,
+  onPriceChange,
+  onToggleCategory,
+  onToggleSubcategory,
+  onClear,
+}) => {
+  const prices = products.map((p) => p.price);
+  const minPrice = prices.length > 0 ? Math.floor(Math.min(...prices)) : 0;
+  const maxPrice = prices.length > 0 ? Math.ceil(Math.max(...prices)) : 1000;
 
-    // Reset price range to full if products change (e.g. initial load)
-    setPriceRange([productsMin, productsMax]);
-  }, [productsMin, productsMax, uniqueSubcategories]);
+  const subcategories = Array.from(new Set(products.map((p) => p.subcategory))).sort();
+  const countByCategory = products.reduce<Record<string, number>>((acc, p) => {
+    acc[p.category] = (acc[p.category] || 0) + 1;
+    return acc;
+  }, {});
 
-  useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      // Only notify when values actually changed — the parent passes a new
-      // callback identity on every render, so an unconditional call would
-      // ping-pong setState forever (infinite re-render loop).
-      const snapshot = JSON.stringify({
-        priceRange,
-        subcategories: selectedSubcategories,
-        categories: selectedCategories,
-      });
-      if (lastSent.current === snapshot) return;
-      lastSent.current = snapshot;
-      onFilterChange({
-        priceRange,
-        subcategories: selectedSubcategories,
-        categories: selectedCategories
-      });
-    }, 300);
-    return () => clearTimeout(debounceTimeout);
-  }, [priceRange, selectedSubcategories, selectedCategories, onFilterChange]);
+  const isActive =
+    filters.priceRange[0] !== minPrice ||
+    filters.priceRange[1] !== maxPrice ||
+    filters.subcategories.length > 0 ||
+    filters.categories.length > 0;
 
-  const handlePriceChange = (newRange: number[]) => {
-    setPriceRange(newRange);
-  };
-
-  const handleSubcategoryChange = (subcategory: string) => {
-    const newSelected = selectedSubcategories.includes(subcategory)
-      ? selectedSubcategories.filter((s) => s !== subcategory)
-      : [...selectedSubcategories, subcategory];
-    setSelectedSubcategories(newSelected);
-  };
-
-  const handleCategoryChange = (category: string) => {
-    const newSelected = selectedCategories.includes(category)
-      ? selectedCategories.filter((c) => c !== category)
-      : [...selectedCategories, category];
-    setSelectedCategories(newSelected);
-  };
-
-  const handleClearFilters = () => {
-    setPriceRange([minPrice, maxPrice]);
-    setSelectedSubcategories([]);
-    setSelectedCategories([]);
-  };
-
-  const isFilterActive =
-    priceRange[0] !== minPrice ||
-    priceRange[1] !== maxPrice ||
-    selectedSubcategories.length > 0 ||
-    selectedCategories.length > 0;
+  const checkbox = (
+    id: string,
+    label: string,
+    checked: boolean,
+    onChange: () => void,
+    count?: number,
+  ) => (
+    <label
+      key={id}
+      htmlFor={id}
+      className={`flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors ${
+        checked ? "bg-[#FF4500]/8 text-gray-900" : "text-gray-600 hover:bg-gray-50"
+      }`}
+    >
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={onChange}
+        className="h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 accent-[#FF4500]"
+      />
+      <span className="flex-1 truncate text-[13px] font-medium">{label}</span>
+      {typeof count === "number" && (
+        <span className="text-[11px] font-semibold text-gray-400">{count}</span>
+      )}
+    </label>
+  );
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <p className="font-semibold mb-4 text-xl">Filters</p>
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-[0_16px_40px_-32px_rgba(2,6,23,0.6)] sm:p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-gray-900">
+          <SlidersHorizontal className="h-4 w-4 text-[#FF4500]" />
+          Filters
+        </p>
+        {isActive && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-gray-600 transition-colors hover:bg-gray-200"
+          >
+            <X className="h-3 w-3" /> Clear
+          </button>
+        )}
+      </div>
 
-      {/* Categories Filter - Only render if allCategories provided */}
-      {allCategories.length > 0 && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Categories</p>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {allCategories.map((category) => (
-              <div key={category} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`cat-${category}`}
-                  checked={selectedCategories.includes(category)}
-                  onChange={() => handleCategoryChange(category)}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label htmlFor={`cat-${category}`} className="ml-2 text-gray-600">
-                  {category}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <p className="font-semibold mb-2">Price Range</p>
-
-        <div className="px-2">
-          <Range
-            step={1}
-            min={minPrice}
-            max={maxPrice}
-            values={priceRange}
-            onChange={handlePriceChange}
-            renderTrack={({ props, children }) => {
-              return (
-                <div
-                  {...props}
-                  className="w-full h-2 bg-gray-200 rounded-full"
-                >
+      <div className="space-y-5">
+        <div>
+          <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-500">
+            Price range
+          </p>
+          <div className="px-2 pt-3">
+            <Range
+              step={1}
+              min={minPrice}
+              max={maxPrice}
+              values={filters.priceRange}
+              onChange={(values) => onPriceChange([values[0], values[1]])}
+              renderTrack={({ props, children }) => (
+                <div {...props} className="h-1.5 w-full rounded-full bg-gray-200">
                   {children}
                 </div>
-              );
-            }}
-            renderThumb={({ props }) => {
-              return (
-                <div
-                  {...props}
-                  className="w-5 h-5 bg-blue-500 rounded-full"
-                />
-              );
-            }}
-          />
-          <div className="flex justify-between mt-2">
-            <span>Ksh.{priceRange[0]}</span>
-            <span>Ksh.{priceRange[1]}</span>
+              )}
+              renderThumb={({ props }) => {
+                // react-range passes the thumb key inside props; React 19 requires
+                // it to be passed directly, so split it out before spreading.
+                const { key, ...rest } = props;
+                return (
+                  <div
+                    key={key}
+                    {...rest}
+                    className="h-4 w-4 rounded-full border-2 border-white bg-[#FF4500] shadow-[0_0_0_1px_rgba(255,69,0,0.4)] focus:outline-none"
+                  />
+                );
+              }}
+            />
+            <div className="mt-3 flex items-center justify-between text-xs font-semibold text-gray-600">
+              <span>Ksh.{filters.priceRange[0].toLocaleString()}</span>
+              <span>Ksh.{filters.priceRange[1].toLocaleString()}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-6">
-        <p className="font-semibold mb-2">Subcategory</p>
-
-        <div className="space-y-2 max-h-48 overflow-y-auto">
-          {subcategories.map((subcategory) => (
-            <div key={subcategory} className="flex items-center">
-              <input
-                type="checkbox"
-                id={subcategory}
-                checked={selectedSubcategories.includes(subcategory)}
-                onChange={() => handleSubcategoryChange(subcategory)}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-
-              <label htmlFor={subcategory} className="ml-2 text-gray-600">
-                {subcategory}
-              </label>
+        {allCategories.length > 0 && (
+          <div>
+            <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-500">
+              Categories
+            </p>
+            <div className="max-h-52 space-y-0.5 overflow-y-auto pr-1">
+              {allCategories.map((category) =>
+                checkbox(
+                  `cat-${category}`,
+                  category,
+                  filters.categories.includes(category),
+                  () => onToggleCategory(category),
+                  countByCategory[category],
+                ),
+              )}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        )}
 
-      <div className="mt-6">
-        <button
-          onClick={handleClearFilters}
-          disabled={!isFilterActive}
-          className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 disabled:bg-gray-300 transition-colors"
-        >
-          Clear Filters
-        </button>
+        <div>
+          <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-500">
+            Type
+          </p>
+          <div className="max-h-52 space-y-0.5 overflow-y-auto pr-1">
+            {subcategories.map((subcategory) =>
+              checkbox(
+                `sub-${subcategory}`,
+                subcategory,
+                filters.subcategories.includes(subcategory),
+                () => onToggleSubcategory(subcategory),
+              ),
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

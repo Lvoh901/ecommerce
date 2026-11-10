@@ -44,8 +44,7 @@ export default function ContactForm() {
     };
 
     return (
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-[0_30px_70px_-20px_rgba(255,69,0,0.3)] border border-white/60 p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 font-['Orbitron']">Send us a Message</h3>
+        <div>
             {status === "sent" && (
                 <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl px-4 py-3 mb-4">
                     Thanks for contacting us! We&apos;ll get back to you soon.
@@ -67,7 +66,7 @@ export default function ContactForm() {
                             required
                             value={formData.name}
                             onChange={handleChange}
-                            className="block w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 focus:bg-white focus:ring-[#FF4500] focus:border-[#FF4500] transition-colors"
+                            className="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-[#FF4500] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF4500]/20"
                             placeholder="Your Name"
                         />
                     </div>
@@ -83,7 +82,7 @@ export default function ContactForm() {
                             required
                             value={formData.email}
                             onChange={handleChange}
-                            className="block w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 focus:bg-white focus:ring-[#FF4500] focus:border-[#FF4500] transition-colors"
+                            className="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-[#FF4500] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF4500]/20"
                             placeholder="you@example.com"
                         />
                     </div>
@@ -99,7 +98,7 @@ export default function ContactForm() {
                             required
                             value={formData.message}
                             onChange={handleChange}
-                            className="block w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 focus:bg-white focus:ring-[#FF4500] focus:border-[#FF4500] transition-colors"
+                            className="block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-[#FF4500] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF4500]/20"
                             placeholder="How can we help you?"
                         />
                     </div>
@@ -109,7 +108,7 @@ export default function ContactForm() {
                     <button
                         type="submit"
                         disabled={status === "sending"}
-                        className="w-full btn-primary flex justify-center items-center py-3 px-4 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF4500]"
+                        className="btn-primary flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wider text-white disabled:opacity-70"
                     >
                         <Send className="w-4 h-4 mr-2" />
                         {status === "sending" ? "Sending…" : "Send Message"}
