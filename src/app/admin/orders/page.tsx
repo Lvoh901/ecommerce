@@ -10,7 +10,7 @@ export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
   return (
     <div>
-      <PageHeader title="Orders" subtitle={`${orders.length} customer orders. Click a row to see items.`} />
+      <PageHeader title="Orders" subtitle={orders.length === 0 ? "No customer orders yet." : `${orders.length} customer ${orders.length === 1 ? "order" : "orders"} · click a row to see items.`} />
       <OrderManager initialOrders={orders} />
     </div>
   );

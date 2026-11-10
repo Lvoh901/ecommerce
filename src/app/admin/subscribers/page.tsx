@@ -15,7 +15,7 @@ export default async function AdminSubscribersPage() {
     <div>
       <PageHeader
         title="Subscribers"
-        subtitle={`${subscribers.length} newsletter signups from the homepage CTA.`}
+        subtitle={`${subscribers.length} ${subscribers.length === 1 ? "newsletter signup" : "newsletter signups"} from the homepage CTA.`}
       />
       <SubscriberManager initialSubscribers={subscribers} isAdmin={session.role === "ADMIN"} />
     </div>

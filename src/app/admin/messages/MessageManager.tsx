@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MailOpen, Reply, Trash2 } from "lucide-react";
+import { MailOpen, Reply, Trash2, Mail } from "lucide-react";
 import type { Message, MessageStatus } from "@prisma/client";
-import { StatusBadge, EmptyState } from "../components";
+import { StatusBadge, EmptyState, formatDateTime } from "../components";
+import { FilterChips, SearchField } from "../ui";
 import { notify } from "@/lib/notify";
+
+const FILTERS = [
+  { value: "ALL", label: "All" },
+  { value: "NEW", label: "Unread" },
+  { value: "READ", label: "Read" },
+  { value: "REPLIED", label: "Replied" },
+];
 
 export default function MessageManager({
   initialMessages,
@@ -17,8 +25,28 @@ export default function MessageManager({
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [filter, setFilter] = useState<string>("ALL");
+  const [query, setQuery] = useState("");
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { ALL: messages.length };
+    messages.forEach((message) => {
+      map[message.status] = (map[message.status] ?? 0) + 1;
+    });
+    return map;
+  }, [messages]);
+
+  const visible = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return messages.filter((message) => {
+      const matchesStatus = filter === "ALL" || message.status === filter;
+      if (!matchesStatus) return false;
+      if (!needle) return true;
+      return `${message.name} ${message.email} ${message.message}`.toLowerCase().includes(needle);
+    });
+  }, [messages, filter, query]);
 
   async function setStatus(message: Message, status: MessageStatus) {
+    if (status === message.status) return;
     const res = await fetch(`/api/messages/${message.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -29,7 +57,8 @@ export default function MessageManager({
       return;
     }
     const data = await res.json();
-    setMessages((prev) => prev.map((m) => (m.id === message.id ? data.message : m)));
+    setMessages((prev) => prev.map((item) => (item.id === message.id ? data.message : item)));
+    notify.toast(`Marked ${status.toLowerCase()}`);
     router.refresh();
   }
 
@@ -41,65 +70,109 @@ export default function MessageManager({
       notify.error("Delete failed", "The message could not be deleted.");
       return;
     }
-    setMessages((prev) => prev.filter((m) => m.id !== id));
+    setMessages((prev) => prev.filter((message) => message.id !== id));
     notify.toast("Message deleted");
     router.refresh();
   }
 
-  const visible = filter === "ALL" ? messages : messages.filter((m) => m.status === filter);
-
-  if (messages.length === 0) return <EmptyState message="Inbox is empty. Contact-form messages will land here." />;
+  if (messages.length === 0) {
+    return <EmptyState title="Inbox is empty" message="Contact-form messages will land here." />;
+  }
 
   return (
     <div>
-      <div className="flex gap-2 mb-4">
-        {["ALL", "NEW", "READ", "REPLIED"].map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold ${filter === s ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-200"}`}
-          >
-            {s}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
+        <SearchField value={query} onChange={setQuery} placeholder="Search sender, email or message…" />
+        <FilterChips label="Filter by status" value={filter} onChange={setFilter} options={FILTERS} counts={counts} />
       </div>
 
-      <div className="space-y-3">
-        {visible.map((m) => (
-          <div key={m.id} className={`bg-white rounded-2xl shadow-sm p-5 ${m.status === "NEW" ? "ring-2 ring-blue-100" : ""}`}>
-            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-              <div>
-                <p className="font-bold text-gray-900">{m.name} <span className="font-normal text-gray-500 text-sm">· {m.email}</span></p>
-                <p className="text-xs text-gray-400">{new Date(m.createdAt).toLocaleString()}</p>
-              </div>
-              <StatusBadge status={m.status} />
-            </div>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{m.message}</p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {m.status === "NEW" && (
-                <button onClick={() => setStatus(m, "READ")} className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">
-                  <MailOpen className="w-3.5 h-3.5" /> Mark read
-                </button>
-              )}
-              {m.status !== "REPLIED" && (
-                <a
-                  href={`mailto:${m.email}?subject=${encodeURIComponent("Re: Your message to KonnectTech")}`}
-                  onClick={() => setStatus(m, "REPLIED")}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FF4500]/10 hover:bg-[#FF4500]/20 text-[#FF4500]"
+      <p className="mt-3 mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {visible.length} of {messages.length} messages
+        {counts.NEW ? ` · ${counts.NEW} unread` : ""}
+      </p>
+
+      {visible.length === 0 ? (
+        <EmptyState title="No messages match" message="Try a different search term or filter." />
+      ) : (
+        <ul className="space-y-3">
+          {visible.map((message) => (
+            <li
+              key={message.id}
+              className={`rounded-2xl border bg-white p-4 shadow-sm transition-colors ${
+                message.status === "NEW" ? "border-sky-200 ring-1 ring-sky-100" : "border-gray-100"
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
+                    message.status === "NEW" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"
+                  }`}
                 >
-                  <Reply className="w-3.5 h-3.5" /> Reply by email
-                </a>
-              )}
-              {isAdmin && (
-                <button onClick={() => handleDelete(m.id)} className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600">
-                  <Trash2 className="w-3.5 h-3.5" /> Delete
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      {visible.length === 0 && <EmptyState message={`No messages with status ${filter}.`} />}
+                  {message.name.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="min-w-0 truncate text-sm font-bold text-gray-900">
+                      {message.name}
+                      <a
+                        href={`mailto:${message.email}`}
+                        className="ml-2 text-xs font-medium text-gray-500 hover:text-[#FF4500] hover:underline"
+                      >
+                        {message.email}
+                      </a>
+                    </p>
+                    <StatusBadge status={message.status} />
+                  </div>
+                  <p className="text-[11px] text-gray-400">
+                    {formatDateTime(message.createdAt)}
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                    {message.message}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {message.status === "NEW" && (
+                      <button
+                        onClick={() => setStatus(message, "READ")}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-bold text-gray-700 transition-colors hover:bg-gray-200"
+                      >
+                        <MailOpen className="h-3.5 w-3.5" /> Mark read
+                      </button>
+                    )}
+                    {message.status !== "REPLIED" && (
+                      <a
+                        href={`mailto:${message.email}?subject=${encodeURIComponent(
+                          "Re: Your message to KonnectTech"
+                        )}`}
+                        onClick={() => setStatus(message, "REPLIED")}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF4500]/10 px-3 py-1.5 text-xs font-bold text-[#c2410c] transition-colors hover:bg-[#FF4500]/20"
+                      >
+                        <Reply className="h-3.5 w-3.5" /> Reply by email
+                      </a>
+                    )}
+                    {message.status !== "NEW" && (
+                      <button
+                        onClick={() => setStatus(message, "NEW")}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-600 transition-colors hover:bg-gray-50"
+                        title="Move back to unread"
+                      >
+                        <Mail className="h-3.5 w-3.5" /> Mark unread
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDelete(message.id)}
+                        className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-100"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

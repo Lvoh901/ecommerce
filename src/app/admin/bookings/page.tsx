@@ -13,7 +13,7 @@ export default async function AdminBookingsPage() {
   });
   return (
     <div>
-      <PageHeader title="Service bookings" subtitle={`${bookings.length} repair/service requests.`} />
+      <PageHeader title="Service bookings" subtitle={bookings.length === 0 ? "No repair or service requests yet." : `${bookings.length} ${bookings.length === 1 ? "request" : "requests"} for repair or service.`} />
       <BookingManager initialBookings={bookings} />
     </div>
   );

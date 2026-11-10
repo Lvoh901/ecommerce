@@ -10,7 +10,7 @@ export default async function AdminMessagesPage() {
   const messages = await prisma.message.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
   return (
     <div>
-      <PageHeader title="Inbox" subtitle={`${messages.length} messages from potential clients.`} />
+      <PageHeader title="Inbox" subtitle={`${messages.length} ${messages.length === 1 ? "message" : "messages"} from potential clients.`} />
       <MessageManager initialMessages={messages} isAdmin={session.role === "ADMIN"} />
     </div>
   );

@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Pencil, Trash2, Plus, X } from "lucide-react";
+import { Pencil, Trash2, Plus, ExternalLink } from "lucide-react";
 import type { Category } from "@prisma/client";
 import { notify } from "@/lib/notify";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { EmptyState, money } from "../components";
+import { Modal, SearchField, Field, inputClass } from "../ui";
 
 type FormState = { name: string; fromPrice: string; image: string; link: string; description: string };
 const EMPTY: FormState = { name: "", fromPrice: "", image: "", link: "/shop", description: "" };
 
-export default function CategoryManager({ initialCategories }: { initialCategories: Category[] }) {
+export default function CategoryManager({
+  initialCategories,
+  productCounts = {},
+}: {
+  initialCategories: Category[];
+  productCounts?: Record<string, number>;
+}) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [editing, setEditing] = useState<Category | null>(null);
@@ -19,6 +27,15 @@ export default function CategoryManager({ initialCategories }: { initialCategori
   const [form, setForm] = useState<FormState>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+
+  const visible = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return categories;
+    return categories.filter((category) =>
+      `${category.name} ${category.description ?? ""}`.toLowerCase().includes(needle)
+    );
+  }, [categories, query]);
 
   function openCreate() {
     setForm(EMPTY);
@@ -27,15 +44,27 @@ export default function CategoryManager({ initialCategories }: { initialCategori
     setError("");
   }
 
-  function openEdit(c: Category) {
-    setForm({ name: c.name, fromPrice: String(c.fromPrice), image: c.image, link: c.link, description: c.description ?? "" });
-    setEditing(c);
+  function openEdit(category: Category) {
+    setForm({
+      name: category.name,
+      fromPrice: String(category.fromPrice),
+      image: category.image,
+      link: category.link,
+      description: category.description ?? "",
+    });
+    setEditing(category);
     setCreating(false);
     setError("");
   }
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
+  function closeModal() {
+    setCreating(false);
+    setEditing(null);
+    setError("");
+  }
+
+  async function handleSave(event: React.FormEvent) {
+    event.preventDefault();
     setSaving(true);
     setError("");
     try {
@@ -52,14 +81,13 @@ export default function CategoryManager({ initialCategories }: { initialCategori
         return;
       }
       if (editing) {
-        setCategories((prev) => prev.map((c) => (c.id === editing.id ? data.category : c)));
+        setCategories((prev) => prev.map((item) => (item.id === editing.id ? data.category : item)));
         notify.toast("Category updated");
       } else {
         setCategories((prev) => [...prev, data.category]);
         notify.toast("Category created");
       }
-      setCreating(false);
-      setEditing(null);
+      closeModal();
       router.refresh();
     } catch {
       setError("Network error.");
@@ -69,99 +97,185 @@ export default function CategoryManager({ initialCategories }: { initialCategori
   }
 
   async function handleDelete(id: number) {
-    const ok = await notify.confirmDelete(
-      "Delete category?",
-      "Products using its name will keep the text value."
-    );
+    const ok = await notify.confirmDelete("Delete category?", "Products using its name will keep the text value.");
     if (!ok) return;
     const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
     if (!res.ok) {
       notify.error("Delete failed", "The category could not be deleted.");
       return;
     }
-    setCategories((prev) => prev.filter((c) => c.id !== id));
+    setCategories((prev) => prev.filter((item) => item.id !== id));
     notify.toast("Category deleted");
     router.refresh();
   }
 
   return (
     <div>
-      <div className="mb-4">
-        <button onClick={openCreate} className="inline-flex items-center gap-2 bg-[#FF4500] hover:bg-orange-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors">
-          <Plus className="w-4 h-4" /> Add category
+      <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:p-4">
+        <SearchField value={query} onChange={setQuery} placeholder="Search categories…" className="flex-1" />
+        <button
+          onClick={openCreate}
+          className="inline-flex h-[42px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF4500] px-4 text-sm font-bold text-white transition-colors hover:bg-[#e03d00]"
+        >
+          <Plus className="h-4 w-4" /> Add category
         </button>
       </div>
 
-      {(creating || editing) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">{editing ? "Edit category" : "New category"}</h2>
-              <button onClick={() => { setCreating(false); setEditing(null); }} className="p-1.5 rounded-lg hover:bg-gray-100" aria-label="Close">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 mb-3">{error}</p>}
-            <form onSubmit={handleSave} className="space-y-3">
-              <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Category name" className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:border-[#FF4500] outline-none" />
-              <div className="grid grid-cols-2 gap-3">
-                <input required type="number" min="0" step="0.01" value={form.fromPrice} onChange={(e) => setForm({ ...form, fromPrice: e.target.value })} placeholder="From price (Ksh)" className="px-3 py-2.5 rounded-xl border border-gray-300 focus:border-[#FF4500] outline-none" />
-                <input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="Link (/shop)" className="px-3 py-2.5 rounded-xl border border-gray-300 focus:border-[#FF4500] outline-none" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-700 mb-1.5">Category image</p>
-                <ImageUpload value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
-              </div>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" rows={2} className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:border-[#FF4500] outline-none" />
-              <button type="submit" disabled={saving} className="w-full bg-gray-900 hover:bg-gray-800 disabled:opacity-60 text-white font-bold py-3 rounded-xl">
-                {saving ? "Saving…" : editing ? "Save changes" : "Create category"}
-              </button>
-            </form>
-          </div>
-        </div>
+      <p className="mt-3 mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {visible.length} of {categories.length} categories
+      </p>
+
+      {visible.length === 0 ? (
+        <EmptyState
+          title="No categories match"
+          message="Categories power the storefront tiles and shop filters."
+          action={
+            <button
+              onClick={openCreate}
+              className="rounded-xl bg-[#FF4500] px-3.5 py-2 text-sm font-bold text-white hover:bg-[#e03d00]"
+            >
+              Add category
+            </button>
+          }
+        />
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {visible.map((category) => {
+            const count = productCounts[category.name] ?? 0;
+            return (
+              <li
+                key={category.id}
+                className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:border-[#FF4500]/30 hover:shadow-[0_10px_30px_-16px_rgba(255,69,0,0.5)]"
+              >
+                <div className="relative h-28 w-full bg-gray-100">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    sizes="(max-width: 768px) 100vw, 320px"
+                  />
+                  <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-gray-700 backdrop-blur">
+                    {count} product{count === 1 ? "" : "s"}
+                  </span>
+                </div>
+                <div className="p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-gray-900">{category.name}</p>
+                      <p className="text-xs text-gray-500">From {money(category.fromPrice)}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <button
+                        onClick={() => openEdit(category)}
+                        className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                        aria-label={`Edit ${category.name}`}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(category.id)}
+                        className="rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50"
+                        aria-label={`Delete ${category.name}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  {category.description && (
+                    <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{category.description}</p>
+                  )}
+                  <a
+                    href={`${category.link}${category.link.includes("?") ? "&" : "?"}category=${encodeURIComponent(
+                      category.name
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#FF4500] hover:underline"
+                  >
+                    <ExternalLink className="h-3 w-3" /> Preview on shop
+                  </a>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
-        <table className="w-full text-sm min-w-[560px]">
-          <thead>
-            <tr className="text-left text-gray-500 border-b border-gray-100">
-              <th className="px-4 py-3 font-semibold">Category</th>
-              <th className="px-4 py-3 font-semibold">From</th>
-              <th className="px-4 py-3 font-semibold">Link</th>
-              <th className="px-4 py-3 font-semibold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {categories.map((c) => (
-              <tr key={c.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                      <Image src={c.image} alt={c.name} fill className="object-cover" sizes="40px" />
-                    </div>
-                    <span className="font-semibold text-gray-900">{c.name}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">Ksh.{c.fromPrice.toLocaleString()}</td>
-                <td className="px-4 py-3 text-gray-500">{c.link}</td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end gap-1">
-                    <button onClick={() => openEdit(c)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600" aria-label={`Edit ${c.name}`}>
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDelete(c.id)} className="p-2 rounded-lg hover:bg-red-50 text-red-600" aria-label={`Delete ${c.name}`}>
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {categories.length === 0 && (
-              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-500">No categories yet.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Modal
+        open={creating || Boolean(editing)}
+        onClose={closeModal}
+        title={editing ? "Edit category" : "New category"}
+        description={editing ? `#${editing.id}` : "Shown on the home page and shop filters."}
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="category-form"
+              disabled={saving}
+              className="rounded-xl bg-[#FF4500] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#e03d00] disabled:opacity-60"
+            >
+              {saving ? "Saving…" : editing ? "Save changes" : "Create category"}
+            </button>
+          </div>
+        }
+      >
+        {error && (
+          <p className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>
+        )}
+        <form id="category-form" onSubmit={handleSave} className="space-y-3">
+          <Field label="Name">
+            <input
+              required
+              value={form.name}
+              onChange={(event) => setForm({ ...form, name: event.target.value })}
+              placeholder="e.g. Cameras"
+              className={inputClass}
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="From price" hint="Ksh">
+              <input
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.fromPrice}
+                onChange={(event) => setForm({ ...form, fromPrice: event.target.value })}
+                placeholder="0"
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Link" hint="Defaults to /shop">
+              <input
+                value={form.link}
+                onChange={(event) => setForm({ ...form, link: event.target.value })}
+                placeholder="/shop"
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <Field label="Description" hint="Optional">
+            <textarea
+              value={form.description}
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
+              rows={2}
+              placeholder="Short line shown on the category tile"
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Category image">
+            <ImageUpload value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
+          </Field>
+        </form>
+      </Modal>
     </div>
   );
 }

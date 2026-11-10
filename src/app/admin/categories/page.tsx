@@ -7,11 +7,19 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
   await requireRole("STAFF");
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, grouped] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.product.groupBy({ by: ["category"], _count: { _all: true } }),
+  ]);
+  const productCounts = Object.fromEntries(grouped.map((row) => [row.category, row._count._all]));
+
   return (
     <div>
-      <PageHeader title="Categories" subtitle={`${categories.length} categories on the store.`} />
-      <CategoryManager initialCategories={categories} />
+      <PageHeader
+        title="Categories"
+        subtitle={`${categories.length} categories, used by the storefront tiles and shop filters.`}
+      />
+      <CategoryManager initialCategories={categories} productCounts={productCounts} />
     </div>
   );
 }
